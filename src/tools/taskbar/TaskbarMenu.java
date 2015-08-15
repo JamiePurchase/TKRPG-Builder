@@ -40,7 +40,7 @@ public class TaskbarMenu
     public void render(Graphics g)
     {
         // Background
-        Drawing.fillRect(g, this.menuArea, Color.WHITE);
+        Drawing.fillRect(g, this.menuArea, "STANDARD_FORE");
         
         // Items
         for(int x = 0; x < this.menuItems.size(); x++)

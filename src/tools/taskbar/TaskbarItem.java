@@ -24,7 +24,7 @@ public class TaskbarItem
     
     private Rectangle getArea(int position)
     {
-        return new Rectangle((50 * position) + 150, 718, 70, 50);
+        return new Rectangle((70 * position) + 150, 718, 70, 50);
     }
     
     public void render(Graphics g, int position)
@@ -35,15 +35,14 @@ public class TaskbarItem
         {
             fill = "SECONDARY_FORE";
             
-            // DEBUG
-            System.out.println("TASKBARITEM -> RENDER: " + Engine.getMouseIdle());
-            
-            if(Engine.getMouseIdle() || Engine.getTooltipActive() == false) {this.renderTooltip(g);}
+            // NOTE: tooltips need a bit of work
+            // NOTE: may wish to make this part of the Application.jar and just pass in styles from this app
+            //if(Engine.getMouseIdle() || Engine.getTooltipActive() == false) {this.renderTooltip(g);}
         }
         Drawing.fillRect(g, this.getArea(position), fill);
         
         // Icon
-        g.drawImage(this.itemIcon, (50 * position) + 160, 718, null);
+        g.drawImage(this.itemIcon, this.getArea(position).x + 10, 718, null);
     }
     
     private void renderTooltip(Graphics g)

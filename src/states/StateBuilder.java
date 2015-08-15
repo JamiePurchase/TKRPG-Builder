@@ -14,6 +14,8 @@ import projects.Project;
 import projects.ProjectManager;
 import tools.Tool;
 import tools.ToolBoard;
+import tools.ToolCharacter;
+import tools.ToolItem;
 import tools.ToolMain;
 import tools.desktop.Desktop;
 import tools.modal.Modal;
@@ -107,6 +109,8 @@ public class StateBuilder extends State
         
         // TEMP
         this.toolInit(new ToolBoard(this));
+        //this.toolInit(new ToolItem(this));
+        //this.toolInit(new ToolCharacter(this));
     }
 
     public void inputMouseClickL(MouseEvent e)
@@ -120,7 +124,8 @@ public class StateBuilder extends State
             // NOTE: check taskmenu first
             if(this.desktop.getArea().contains(e.getPoint())) {this.desktop.inputClick(e);}
             if(this.taskbar.getTaskbarRect().contains(e.getPoint())) {this.taskbar.inputClick(e);}
-            this.toolMain.inputClick(e);
+            //this.toolMain.inputClick(e);
+            if(this.toolActive) {getToolFocus().inputClick(e);}
         }
     }
 

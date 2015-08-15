@@ -15,6 +15,7 @@ public class Fonts
         gfx.Fonts.addFont("TASKBAR_MENU", new Font("Times New Roman", Font.PLAIN, 36));
         gfx.Fonts.addFont("TASKBAR_MENU_ITEM", new Font("Times New Roman", Font.PLAIN, 22));
         gfx.Fonts.addFont("TITLEBAR", new Font("Times New Roman", Font.PLAIN, 22));
+        gfx.Fonts.addFont("TOOLBAR", new Font("Times New Roman", Font.ITALIC, 20));
     }
     
 }

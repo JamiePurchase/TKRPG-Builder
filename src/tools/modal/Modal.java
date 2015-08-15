@@ -43,6 +43,11 @@ public abstract class Modal
         return this.modalArea;
     }
     
+    private Rectangle getAreaInner()
+    {
+        return new Rectangle(this.modalArea.x + 5, this.modalArea.y + 34, this.modalArea.width - 10, this.modalArea.height - 39);
+    }
+    
     public abstract void inputClick(MouseEvent e);
     
     public abstract void inputKey(String key);
@@ -72,6 +77,15 @@ public abstract class Modal
         
         // Blocks
         this.renderModalBlocks(g);
+        
+        // Border
+        this.renderModalBorder(g);
+    }
+    
+    private void renderModalBorder(Graphics g)
+    {
+        Drawing.drawRect(g, this.getArea(), "BLACK");
+        Drawing.drawRect(g, this.getAreaInner(), "BLACK");
     }
     
     private void renderModalBlocks(Graphics g)

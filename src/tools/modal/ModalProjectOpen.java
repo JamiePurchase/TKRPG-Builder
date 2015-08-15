@@ -68,7 +68,7 @@ public class ModalProjectOpen extends Modal
             {
                 Drawing.drawRect(g, this.getFileRect(x), "STANDARD_FORE");
             }
-            g.drawImage(Drawing.getImage("icon/project.png"), 360, (40 * x) + 200, null);
+            g.drawImage(Drawing.getImage("icon/io_project.png"), 360, (40 * x) + 200, null);
             Text.write(g, this.projects.get(x).getName(), 410, (40 * x) + 225, "LEFT", "FILE_BROWSE", "BLACK");
         }
     }

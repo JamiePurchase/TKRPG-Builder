@@ -8,6 +8,7 @@ public class Colours
     public static void loadColours()
     {
         Colour.addColour("DESKTOP_FILL", 153, 219, 181);
+        Colour.addColour("FADE_GREEN", 85, 107, 62);
         Colour.addColour("STANDARD_BACK", 196, 216, 150);
         Colour.addColour("STANDARD_FORE", 125, 157, 102);
         Colour.addColour("SECONDARY_FORE", 163, 200, 125);
