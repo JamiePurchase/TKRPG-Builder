@@ -22,9 +22,11 @@ public class ModalProjectOpen extends Modal
     
     public ModalProjectOpen(StateBuilder state)
     {
-        super("Open Project", new Rectangle(333, 159, 700, 450));
+        super("Open Project", new Rectangle(333, 159, 700, 450), true);
         this.state = state;
         this.projects = ProjectManager.getProjectArray();
+        
+        // NOTE: this needs to use a filebrowser
         
         // TEMP
         /*BlockForm form = new BlockForm("NEW_");
@@ -43,7 +45,7 @@ public class ModalProjectOpen extends Modal
         {
             if(this.getFileRect(x).contains(e.getPoint()))
             {
-                this.state.setProjectOpen(this.projects.get(x));
+                this.state.setProject(this.projects.get(x));
                 this.state.setModal();
             }
         }

@@ -1,35 +1,102 @@
 package tools.taskbar;
 
+import app.Engine;
+import gfx.Colour;
 import gfx.Drawing;
 import gfx.Text;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import states.StateBuilder;
+import states.StateExit;
 
 public class TaskbarMenu
 {
     private StateBuilder state;
-    private Rectangle menuArea;
     private ArrayList<TaskbarMenuItem> menuItems;
     private boolean menuActive;
     
     public TaskbarMenu(StateBuilder state)
     {
         this.state = state;
-        this.menuArea = new Rectangle(0, 200, 250, 518);
-        this.menuItems = new ArrayList();
         this.menuActive = false;
-        
-        // TEMP
-        this.menuItems.add(new TaskbarMenuItem(this, "QUIT", null));
+        this.build();
     }
     
-    public void inputClick()
+    public void build()
     {
+        // Blank Array
+        this.menuItems = new ArrayList();
+        
+        // No Project Options
+        if(this.state.getProject() == null)
+        {
+            this.menuItems.add(new TaskbarMenuItem(this, "NEW", "NEW PROJECT", "file_new"));
+        }
+        
+        // Regular Options
+        else
+        {
+            this.menuItems.add(new TaskbarMenuItem(this, "PRO", "PROJECT SETTINGS", "file_new"));
+            this.menuItems.add(new TaskbarMenuItem(this, "BRD", "BOARD EDITOR", "file_new"));
+        }
+        
+        // Standard Options
+        this.menuItems.add(new TaskbarMenuItem(this, "CONFIG", "SETTINGS", "main_settings"));
+        this.menuItems.add(new TaskbarMenuItem(this, "ABOUT", "ABOUT BUILDER", "main_about"));
+        this.menuItems.add(new TaskbarMenuItem(this, "QUIT", "EXIT BUILDER", "board_delete"));
+    }
+    
+    public Rectangle getArea()
+    {
+        return new Rectangle(0, 718 - (this.menuItems.size() * 50), 350, this.menuItems.size() * 50);
+        // NOTE: may wish to get the text length of the longest item and use that to determine width
+    }
+    
+    public void inputClickButton()
+    {
+        // Clicked on the 'MENU' button
         if(this.menuActive) {this.menuActive = false;}
         else {this.menuActive = true;}
+    }
+    
+    public void inputClickMenu(MouseEvent e)
+    {
+        // Clicked in the menu area
+        for(int x = 0; x < this.menuItems.size(); x++)
+        {
+            // Clicked on an menu item
+            if(this.menuItems.get(x).getArea(x).contains(e.getPoint())) {this.inputClickMenuItem(this.menuItems.get(x).getRef());}
+            
+            // Close the menu
+            this.setActive(false);
+        }
+    }
+    
+    private void inputClickMenuItem(String ref)
+    {
+        // New Project
+        if(ref.equals("NEW"))
+        {
+            //
+        }
+        
+        // Project Settings
+        if(ref.equals("PRO")) {this.state.toolActionProject();}
+        
+        // Board Editor
+        if(ref.equals("BRD")) {this.state.toolActionBoard();}
+        
+        // Settings
+        if(ref.equals("CONFIG")) {state.actionConfig(true);}
+        
+        // About Builder
+        if(ref.equals("ABOUT")) {state.actionAbout(true);}
+        
+        // Exit Builder
+        if(ref.equals("QUIT")) {state.actionExit();}
     }
     
     public boolean isActive()
@@ -40,16 +107,24 @@ public class TaskbarMenu
     public void render(Graphics g)
     {
         // Background
-        Drawing.fillRect(g, this.menuArea, "STANDARD_FORE");
+        Drawing.fillRect(g, this.getArea(), "STANDARD_FORE");
         
         // Items
         for(int x = 0; x < this.menuItems.size(); x++)
         {
-            this.menuItems.get(x).render(g, 500);
+            this.menuItems.get(x).render(g, x);
         }
         
-        // Border
-        Drawing.drawRect(g, this.menuArea, Color.BLACK);
+        // Border (top, bottom and left) - could we make a Drawing method that takes a rect, colour and which sides to draw?
+        g.setColor(Colour.getColour("BLACK"));
+        g.drawLine(this.getArea().x, this.getArea().y, this.getArea().x + this.getArea().width, this.getArea().y);
+        g.drawLine(this.getArea().x + this.getArea().width, this.getArea().y, this.getArea().x + this.getArea().width, this.getArea().y + this.getArea().height);
+        g.drawLine(this.getArea().x, this.getArea().y + this.getArea().height, this.getArea().x + this.getArea().width, this.getArea().y + this.getArea().height);
+    }
+    
+    public void setActive(boolean value)
+    {
+        this.menuActive = value;
     }
     
     public void tick()

@@ -4,7 +4,6 @@ import app.Engine;
 import gfx.Colour;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import projects.ProjectManager;
 
 public class StateIntro extends State
 {

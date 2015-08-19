@@ -14,21 +14,24 @@ public abstract class Modal
 {
     private String modalTitle;
     private Rectangle modalArea;
+    private boolean modalClose;
     private BufferedImage modalIcon;
     private ArrayList<Block> modalBlock;
     
-    public Modal(String title, Rectangle area)
+    public Modal(String title, Rectangle area, boolean close)
     {
         this.modalTitle = title;
         this.modalArea = area;
+        this.modalClose = close;
         this.modalIcon = null;
         this.modalBlock = new ArrayList();
     }
     
-    public Modal(String title, Rectangle area, BufferedImage icon)
+    public Modal(String title, Rectangle area, boolean close, BufferedImage icon)
     {
         this.modalTitle = title;
         this.modalArea = area;
+        this.modalClose = close;
         this.modalIcon = icon;
         this.modalBlock = new ArrayList();
     }
@@ -73,7 +76,10 @@ public abstract class Modal
         Text.write(g, this.modalTitle, titlePos, this.modalArea.y + 24, "LEFT", "TITLEBAR", "BLACK");
         
         // Titlebar Close
-        //this.renderWindowClose(g);
+        if(this.modalClose)
+        {
+            // NOTE: render the close button if we need to
+        }
         
         // Blocks
         this.renderModalBlocks(g);

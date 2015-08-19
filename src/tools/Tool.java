@@ -4,7 +4,6 @@ import app.Engine;
 import gfx.Colour;
 import gfx.Drawing;
 import gfx.Text;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
@@ -16,6 +15,7 @@ import tools.taskbar.TaskbarItem;
 public abstract class Tool
 {
     private StateBuilder state;
+    private String toolRef;
     private int toolID;
     private String toolTitle;
     private Rectangle toolArea;
@@ -23,9 +23,10 @@ public abstract class Tool
     private boolean toolSaved;
     private BufferedImage toolTaskIcon;
     
-    public Tool(StateBuilder state, int id, String title, BufferedImage icon)
+    public Tool(StateBuilder state, String ref, int id, String title, BufferedImage icon)
     {
         this.state = state;
+        this.toolRef = ref;
         this.toolID = id;
         this.toolTitle = title;
         this.toolArea = new Rectangle(0, 0, 1366, 718);
@@ -50,6 +51,11 @@ public abstract class Tool
         return new Rectangle(this.toolArea.x + this.toolArea.width - 28, this.toolArea.y + 6, 22, 22);
     }
     
+    public StateBuilder getState()
+    {
+        return this.state;
+    }
+    
     public TaskbarItem getTaskbarItem()
     {
         return new TaskbarItem(this.toolTitle, this, this.toolTaskIcon);
@@ -63,6 +69,16 @@ public abstract class Tool
     public Rectangle getToolRect()
     {
         return this.toolArea;
+    }
+    
+    public Rectangle getToolRectContent()
+    {
+        return new Rectangle(this.toolArea.x + 6, this.toolArea.y + 77, this.toolArea.width - 11, this.toolArea.height - 82);
+    }
+    
+    public String getToolRef()
+    {
+        return this.toolRef;
     }
     
     public abstract void inputClick(MouseEvent e);
@@ -86,8 +102,13 @@ public abstract class Tool
     
     public void renderWindow(Graphics g)
     {
+        this.renderWindow(g, "BLACK");
+    }
+    
+    public void renderWindow(Graphics g, String background)
+    {
         // Tool Background
-        Drawing.fillRect(g, this.toolArea, "BLACK");
+        Drawing.fillRect(g, this.toolArea, background);
         
         // Titlebar
         Drawing.fillRect(g, this.toolArea.x, this.toolArea.y, this.toolArea.width, 34, "STANDARD_FORE");
@@ -98,6 +119,9 @@ public abstract class Tool
         this.renderWindowClose(g);
         
         // Tool Border
+        Drawing.drawLine(g, this.toolArea.x + 5, this.toolArea.y + 34, this.toolArea.x + 5, this.toolArea.y + (this.toolArea.height - 5), "BLACK");
+        Drawing.drawLine(g, this.toolArea.x + this.toolArea.width - 5, this.toolArea.y + 34, this.toolArea.x + this.toolArea.width - 5, this.toolArea.y + (this.toolArea.height - 5), "BLACK");
+        Drawing.drawLine(g, this.toolArea.x + 5, this.toolArea.y + (this.toolArea.height - 5), this.toolArea.x + this.toolArea.width - 5, this.toolArea.y + (this.toolArea.height - 5), "BLACK");
         Drawing.drawRect(g, this.toolArea, 5, "STANDARD_FORE");
         this.renderBorder(g);
     }

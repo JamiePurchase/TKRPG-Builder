@@ -25,6 +25,11 @@ public class ProjectManager
         // Update ??? (list of recent projects?)
     }
     
+    public static String getPath(String name)
+    {
+        return Engine.getAppVariable("BUILDER_PATH") + "Projects/" + name + ".tk7pro";
+    }
+    
     public static Project getProject(File file)
     {
         return new Project(FileService.getFileName(file));

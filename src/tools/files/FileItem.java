@@ -20,7 +20,22 @@ public class FileItem
     
     public BufferedImage getIcon()
     {
-        return Drawing.getImage("icon/data_" + this.fileType.toString());
+        return Drawing.getImage("icon/io_" + this.fileType.toString() + ".png");
+    }
+    
+    public String getName()
+    {
+        return this.fileName;
+    }
+    
+    public File getPath()
+    {
+        return this.filePath;
+    }
+    
+    public FileType getType()
+    {
+        return this.fileType;
     }
     
 }

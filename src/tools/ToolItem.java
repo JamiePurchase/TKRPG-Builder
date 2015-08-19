@@ -11,7 +11,7 @@ public class ToolItem extends Tool
     
     public ToolItem(StateBuilder state)
     {
-        super(state, state.getToolNext(), "ITEM EDITOR", Drawing.getImage("icon/tool_items.png"));
+        super(state, "ITM", state.getToolNext(), "ITEM EDITOR", Drawing.getImage("icon/tool_items.png"));
     }
     
     public void inputClick(MouseEvent e)

@@ -13,7 +13,7 @@ public class ModalProjectNew extends Modal
     
     public ModalProjectNew()
     {
-        super("New Project", new Rectangle(433, 209, 500, 350));
+        super("New Project", new Rectangle(433, 209, 500, 350), true);
         
         // TEMP
         /*BlockForm form = new BlockForm("NEW_");

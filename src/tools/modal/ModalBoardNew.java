@@ -11,7 +11,7 @@ public class ModalBoardNew extends Modal
     
     public ModalBoardNew()
     {
-        super("New Board", new Rectangle(433, 209, 500, 350));
+        super("New Board", new Rectangle(433, 209, 500, 350), true);
         
         // TEMP
         /*BlockForm form = new BlockForm("NEW_");

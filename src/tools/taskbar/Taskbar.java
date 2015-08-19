@@ -5,14 +5,15 @@ import gfx.Drawing;
 import gfx.Text;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import projects.Project;
 import states.StateBuilder;
+import tools.ToolProject;
 import tools.modal.ModalProjectOpen;
 
 public class Taskbar
@@ -61,10 +62,52 @@ public class Taskbar
         return this.taskbarArea;
     }
     
+    private int getTrayItemAtPoint(Point point)
+    {
+        for(int x = 0; x < this.taskbarItems.size(); x++)
+        {
+            if(this.taskbarItems.get(x).getArea(x).contains(point))
+            {
+                return x;
+            }
+        }
+        return 0;
+    }
+    
+    private Rectangle getTrayRect()
+    {
+        return new Rectangle(150, 718, 832, 50);
+    }
+    
     public void inputClick(MouseEvent e)
     {
-        if(this.getMenuRect().contains(e.getPoint())) {this.state.getTaskMenu().inputClick();}
-        if(this.getProjectRect().contains(e.getPoint())) {this.state.setModal(new ModalProjectOpen(this.state));}
+        // Menu Button
+        if(this.getMenuRect().contains(e.getPoint())) {this.state.getTaskMenu().inputClickButton();}
+        
+        // Project Button
+        if(this.getProjectRect().contains(e.getPoint())) {this.inputClickProject();}
+        
+        // Taskbar Tray
+        if(this.getTrayRect().contains(e.getPoint())) {this.inputClickTray(e);}
+    }
+    
+    private void inputClickTray(MouseEvent e)
+    {
+        this.state.toolFocus(this.getTrayItemAtPoint(e.getPoint()));
+    }
+    
+    private void inputClickProject()
+    {
+        // No Project
+        if(this.state.getProject() == null) {this.state.setModal(new ModalProjectOpen(this.state));}
+        
+        // Project Loaded
+        else {this.state.toolActionProject();}
+    }
+    
+    public void inputContext(MouseEvent e)
+    {
+        this.state.toolClose(this.getTrayItemAtPoint(e.getPoint()));
     }
     
     public void render(Graphics g)

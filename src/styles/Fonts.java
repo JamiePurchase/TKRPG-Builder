@@ -11,6 +11,7 @@ public class Fonts
         gfx.Fonts.addFont("CLOCK_TIME", new Font("Courier New", Font.PLAIN, 18));
         gfx.Fonts.addFont("FILE_BROWSE", new Font("Courier New", Font.PLAIN, 26));
         gfx.Fonts.addFont("INFOBAR", new Font("Times New Roman", Font.PLAIN, 14));
+        gfx.Fonts.addFont("MESSAGE_STANDARD", new Font("Courier New", Font.PLAIN, 26));
         gfx.Fonts.addFont("STANDARD", new Font("Segoe Print", Font.PLAIN, 14));
         gfx.Fonts.addFont("TASKBAR_MENU", new Font("Times New Roman", Font.PLAIN, 36));
         gfx.Fonts.addFont("TASKBAR_MENU_ITEM", new Font("Times New Roman", Font.PLAIN, 22));

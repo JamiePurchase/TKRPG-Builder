@@ -10,10 +10,10 @@ import system.ID;
 public class BoardManager
 {
     
-    public static Board createBoard()
+    /*public static Board createBoard()
     {
         return new Board(new ID("1"), "BOARD", 20, 16);
-    }
+    }*/
     
     /*public static Board getBoard()
     {
@@ -43,5 +43,26 @@ public class BoardManager
     {
         return getBoardDirectory() + extend;
     }*/
+    
+    public static String getPath(String project, String file)
+    {
+        return Engine.getAppVariable("BUILDER_PATH") + "Data/" + project + "/Boards/" + file + ".tk7brd";
+    }
+    
+    public static Board loadBoard(String project, String file)
+    {
+        // Load the Board File
+        ArrayList<String> data = FileService.loadFile(getPath(project, file));
+        
+        // Create the Board Object
+        int sizeX = Integer.parseInt(data.get(1).split("\\|")[0]);
+        int sizeY = Integer.parseInt(data.get(1).split("\\|")[1]);
+        Board board = new Board(project, data.get(0), sizeX, sizeY);
+        
+        // Set the Board Terrain
+        
+        // Return the Board Object
+        return board;
+    }
     
 }

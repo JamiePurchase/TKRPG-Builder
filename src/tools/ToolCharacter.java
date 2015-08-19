@@ -11,7 +11,7 @@ public class ToolCharacter extends Tool
     
     public ToolCharacter(StateBuilder state)
     {
-        super(state, state.getToolNext(), "CHARACTER EDITOR", Drawing.getImage("icon/tool_characters.png"));
+        super(state, "CHR", state.getToolNext(), "CHARACTER EDITOR", Drawing.getImage("icon/tool_characters.png"));
     }
     
     public void inputClick(MouseEvent e)

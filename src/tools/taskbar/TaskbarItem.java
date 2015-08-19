@@ -22,7 +22,7 @@ public class TaskbarItem
         this.itemIcon = icon;
     }
     
-    private Rectangle getArea(int position)
+    public Rectangle getArea(int position)
     {
         return new Rectangle((70 * position) + 150, 718, 70, 50);
     }
