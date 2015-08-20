@@ -1,7 +1,5 @@
 package tools.files;
 
-import app.Engine;
-import gfx.Drawing;
 import gfx.Text;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -15,23 +13,42 @@ public class FileBrowser extends Modal
     private int browserPage;
     
     // NOTE: need to take in the directory and the file type
-    public FileBrowser(String title)
+    public FileBrowser(String title, ArrayList<FileItem> items)
     {
         super(title, new Rectangle(333, 159, 700, 450), true);
-        this.browserItems = new ArrayList();
+        //this.browserItems = new ArrayList();
+        this.browserItems = items;
         this.browserPage = 0;
     }
     
-    public FileBrowser(String title, Rectangle area)
+    public FileBrowser(String title, ArrayList<FileItem> items, Rectangle area)
     {
         super(title, area, true);
-        this.browserItems = new ArrayList();
+        //this.browserItems = new ArrayList();
+        this.browserItems = items;
         this.browserPage = 0;
+    }
+    
+    private Rectangle getFileItemArea(int pos)
+    {
+        return new Rectangle(360, (40 * pos) + 200, 32, 32);
     }
     
     public void inputClick(MouseEvent e)
     {
-        //
+        inputClickFile(e);
+    }
+    
+    public FileItem inputClickFile(MouseEvent e)
+    {
+        for(int x = 0; x < this.browserItems.size(); x++)
+        {
+            if(this.getFileItemArea(x).contains(e.getPoint()))
+            {
+                return this.browserItems.get(x);
+            }
+        }
+        return null;
     }
     
     public void inputKey(String key)

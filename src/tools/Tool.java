@@ -135,6 +135,11 @@ public abstract class Tool
         Drawing.drawRect(g, this.getCloseRect(), "BLACK");
     }
     
+    public void setTitle(String title)
+    {
+        this.toolTitle = title;
+    }
+    
     public abstract void tick();
     
 }

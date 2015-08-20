@@ -9,7 +9,7 @@ public class ModalBoardOpen extends FileBrowser
     
     public ModalBoardOpen()
     {
-        super("OPEN BOARD");
+        super("OPEN BOARD", null);
     }
     
     public void inputClick(MouseEvent e)

@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import states.StateBuilder;
 import states.StateExit;
+import tools.modal.ModalProjectOpen;
 
 public class TaskbarMenu
 {
@@ -34,6 +35,7 @@ public class TaskbarMenu
         if(this.state.getProject() == null)
         {
             this.menuItems.add(new TaskbarMenuItem(this, "NEW", "NEW PROJECT", "file_new"));
+            this.menuItems.add(new TaskbarMenuItem(this, "OPEN", "OPEN PROJECT", "file_open"));
         }
         
         // Regular Options
@@ -41,6 +43,7 @@ public class TaskbarMenu
         {
             this.menuItems.add(new TaskbarMenuItem(this, "PRO", "PROJECT SETTINGS", "file_new"));
             this.menuItems.add(new TaskbarMenuItem(this, "BRD", "BOARD EDITOR", "file_new"));
+            this.menuItems.add(new TaskbarMenuItem(this, "ITM", "ITEM EDITOR", "file_new"));
         }
         
         // Standard Options
@@ -83,11 +86,17 @@ public class TaskbarMenu
             //
         }
         
+        // Open Project
+        if(ref.equals("OPEN")) {this.state.setModal(new ModalProjectOpen(this.state));}
+        
         // Project Settings
         if(ref.equals("PRO")) {this.state.toolActionProject();}
         
         // Board Editor
         if(ref.equals("BRD")) {this.state.toolActionBoard();}
+        
+        // Item Editor
+        if(ref.equals("ITM")) {this.state.toolActionItem();}
         
         // Settings
         if(ref.equals("CONFIG")) {state.actionConfig(true);}

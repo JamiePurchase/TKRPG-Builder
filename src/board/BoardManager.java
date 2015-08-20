@@ -2,64 +2,81 @@ package board;
 
 import app.Engine;
 import file.FileService;
+import items.ItemFile;
 import java.io.File;
 import java.util.ArrayList;
 import projects.Project;
 import system.ID;
+import tools.files.FileItem;
+import tools.files.FileType;
 
 public class BoardManager
 {
+    private String project;
     
-    /*public static Board createBoard()
+    public BoardManager(String project)
     {
-        return new Board(new ID("1"), "BOARD", 20, 16);
-    }*/
+        this.project = project;
+    }
     
-    /*public static Board getBoard()
-    {
-        return new Board();
-    }*/
-    
-    // NOTE: it would be far too clunky and inefficient to build an array of board objects
-    // we should create an array of FileItems (that are used as pointers in the FileBrowser)
-    /*public static ArrayList<Project> getBoardArray()
+    public ArrayList<FileItem> getBoardArray()
     {
         ArrayList<File> files = FileService.getFolder(getBoardDirectory(), true, false, "tk7brd");
-        ArrayList<Project> projects = new ArrayList();
+        ArrayList<FileItem> items = new ArrayList();
         for(int x = 0; x < files.size(); x++)
         {
-            projects.add(getBoard(files.get(x)));
+            items.add(new FileItem(files.get(x), FileType.ITEM));
         }
-        return projects;
-    }*/
-    
-    /*private static String getBoardDirectory()
-    {
-        return Engine.getAppVariable("BUILDER_PATH") + "Data/" + APPNAME + "/Boards/";
-        // NOTE: appname in the path above needs sorting
+        return items;
     }
     
-    private static String getBoardDirectory(String extend)
+    private String getBoardDirectory()
     {
-        return getBoardDirectory() + extend;
-    }*/
-    
-    public static String getPath(String project, String file)
-    {
-        return Engine.getAppVariable("BUILDER_PATH") + "Data/" + project + "/Boards/" + file + ".tk7brd";
+        return Engine.getAppVariable("BUILDER_PATH") + "Data/" + this.project + "/Boards/";
     }
     
-    public static Board loadBoard(String project, String file)
+    public String getPath(String file)
+    {
+        return Engine.getAppVariable("BUILDER_PATH") + "Data/" + this.project + "/Boards/" + file + ".tk7brd";
+    }
+    
+    public BoardFile loadBoard(File file)
+    {
+        return loadBoard(file.getPath());
+    }
+    
+    public BoardFile loadBoard(String file)
     {
         // Load the Board File
-        ArrayList<String> data = FileService.loadFile(getPath(project, file));
+        ArrayList<String> data = FileService.loadFile(getPath(file));
         
         // Create the Board Object
         int sizeX = Integer.parseInt(data.get(1).split("\\|")[0]);
         int sizeY = Integer.parseInt(data.get(1).split("\\|")[1]);
-        Board board = new Board(project, data.get(0), sizeX, sizeY);
+        BoardFile board = new BoardFile(project, file, data.get(0), sizeX, sizeY);
         
         // Set the Board Terrain
+        int tileX = 0;
+        int tileY = 0;
+        String tileSet = "";
+        int tileCol = 0;
+        int tileRow = 0;
+        for(int tile = 0; tile < (sizeX * sizeY); tile++)
+        {
+            // Set Terrain
+            tileSet = data.get(tile + 2).split("\\|")[0];
+            tileCol = Integer.parseInt(data.get(tile + 2).split("\\|")[1]);
+            tileRow = Integer.parseInt(data.get(tile + 2).split("\\|")[2]);
+            board.setTerrainAt(tileX, tileY, new Terrain(tileSet, tileCol, tileRow));
+            
+            // Next Tile
+            tileX ++;
+            if(tileX >= sizeX)
+            {
+                tileX = 0;
+                tileY ++;
+            }
+        }
         
         // Return the Board Object
         return board;

@@ -6,16 +6,13 @@ import java.io.File;
 
 public class FileItem
 {
-    private String fileName;
     private File filePath;
     private FileType fileType;
     
-    public FileItem(String name, File path)
+    public FileItem(File path, FileType type)
     {
-        this.fileName = name;
         this.filePath = path;
-        //this.fileType = type;
-        // NOTE: alot of these values can be found automatically
+        this.fileType = type;
     }
     
     public BufferedImage getIcon()
@@ -25,7 +22,8 @@ public class FileItem
     
     public String getName()
     {
-        return this.fileName;
+        String name = this.filePath.getName();
+        return name.substring(0, name.length() - 7);
     }
     
     public File getPath()

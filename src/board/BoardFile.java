@@ -1,5 +1,6 @@
 package board;
 
+import app.Engine;
 import file.FileService;
 import gfx.Drawing;
 import java.awt.Graphics;
@@ -7,15 +8,16 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import tiles.TilesetManager;
 
-public class Board
+public class BoardFile
 {
-    private String boardProject, boardName;
+    private String boardProject, boardFile, boardName;
     private int boardSizeX, boardSizeY;
     private Terrain[][] boardTerrain;
     
-    public Board(String project, String name, int sizeX, int sizeY)
+    public BoardFile(String project, String file, String name, int sizeX, int sizeY)
     {
         this.boardProject = project;
+        this.boardFile = file;
         this.boardName = name;
         this.boardSizeX = sizeX;
         this.boardSizeY = sizeY;
@@ -34,7 +36,7 @@ public class Board
     
     public int getSizeY()
     {
-        return this.boardSizeX;
+        return this.boardSizeY;
     }
     
     public Terrain[][] getTerrain()
@@ -49,18 +51,30 @@ public class Board
     
     public void save()
     {
-        FileService.saveFile(this.saveData(), TilesetManager.getPath(this.boardProject, this.boardName));
+        FileService.saveFile(this.saveData(), savePath());
     }
     
     private ArrayList<String> saveData()
     {
+        System.out.println("BOARD FILE -> SAVE");
+        
         ArrayList<String> data = new ArrayList();
         data.add(this.getName());
         data.add(this.getSizeX() + "|" + this.getSizeY());
-        // Loop through all tiles
-        data.add(this.getTerrainAt(0, 0).getData());
-        //
+        for(int x = 0; x < this.getSizeX(); x++)
+        {
+            for(int y = 0; y < this.getSizeY(); y++)
+            {
+                System.out.println(this.getTerrainAt(x, y).getData());
+                data.add(this.getTerrainAt(x, y).getData());
+            }
+        }
         return data;
+    }
+    
+    private String savePath()
+    {
+        return Engine.getAppVariable("BUILDER_PATH") + "Data/" + this.boardProject + "/Boards/" + this.boardFile + ".tk7brd";
     }
     
     public void setTerrainAll(Terrain terrain)

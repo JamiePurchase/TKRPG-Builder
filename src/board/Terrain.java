@@ -23,7 +23,7 @@ public class Terrain
     
     public BufferedImage getImage()
     {
-        return this.getTileset().getTileAt(0, 0);
+        return this.getTileset().getTileAt(this.terrainTileCol, this.terrainTileRow);
     }
     
     private Tileset getTileset()

@@ -1,14 +1,17 @@
 package tools;
 
 import board.Board;
+import board.BoardFile;
 import board.BoardManager;
 import board.Terrain;
 import gfx.Drawing;
+import items.ItemFile;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import states.StateBuilder;
 import tiles.Tileset;
+import tools.files.FileBrowser;
 import tools.modal.Modal;
 import tools.modal.ModalBoardNew;
 import tools.toolbar.Toolbar;
@@ -21,7 +24,7 @@ public class ToolBoard extends Tool
     
     // Board File
     private boolean boardFileActive, boardFileSaved;
-    private Board boardFileObject;
+    private BoardFile boardFileObject;
     
     // Board Display
     private int boardOffsetX, boardOffsetY;
@@ -33,20 +36,15 @@ public class ToolBoard extends Tool
     // Options
     private ToolBoardMode boardMode;
     private ToolBoardPaint optionPaintType;
-    //private tile optionPaintTile;
+    private Terrain optionPaintTerrain;
     private boolean optionViewGrid, optionViewRuler;
-    
-    // TEMP
-    private int tempTile;
     
     public ToolBoard(StateBuilder state)
     {
         super(state, "BRD", state.getToolNext(), "BOARD EDITOR", Drawing.getImage("icon/tool_board.png"));
         
         // Board File
-        this.boardFileActive = false;
-        this.boardFileObject = null;
-        this.boardFileSaved = true;
+        this.fileClose();
         
         // Board Offset
         this.boardOffsetX = 0;
@@ -59,24 +57,35 @@ public class ToolBoard extends Tool
         // Mode
         this.boardMode = ToolBoardMode.TERRAIN;
         this.optionPaintType = ToolBoardPaint.BRUSH;
-        //this.optionPaintTile
+        this.optionPaintTerrain = new Terrain("TEST", 2, 0);
         
         // Toolbar
         this.toolbarInit();
-        
-        // TEMP
-        //Board testBoard = new Board("Mushroom", "TEST", 5, 5);
-        //testBoard.setTerrainAll(new Terrain("TEST", 0, 0));
-        //testBoard.setTerrainAt(1, 0, new Terrain("TEST", 1, 0));
-        //this.boardFileObject = testBoard;
-        tempTile = 0;
-        
-        // TEMP
-        /*Board tempBoard = BoardManager.loadBoard("Mushroom", "TEST");
-        System.out.println("TEST BOARD");
-        System.out.println("Name: " + tempBoard.getName());
-        System.out.println("Size: " + tempBoard.getSizeX() + " x " + tempBoard.getSizeY());
-        System.out.println("");*/
+    }
+    
+    public void fileClose()
+    {
+        this.boardFileActive = false;
+        this.boardFileObject = null;
+        this.boardFileSaved = true;
+        this.updateTitle();
+    }
+    
+    public void fileNew()
+    {
+        // NOTE: consider how this works
+        this.boardFileActive = true;
+        this.boardFileObject = null;
+        this.boardFileSaved = false;
+        this.updateTitle();
+    }
+    
+    public void fileOpen(BoardFile file)
+    {
+        this.boardFileActive = true;
+        this.boardFileObject = file;
+        this.boardFileSaved = true;
+        this.updateTitle();
     }
     
     private Rectangle getAreaBoard()
@@ -171,9 +180,7 @@ public class ToolBoard extends Tool
             if(this.optionPaintType == ToolBoardPaint.BRUSH)
             {
                 // Set board tile at position to current terrain
-                
-                // TEMP
-                this.tempTile = 1;
+                this.boardFileObject.setTerrainAt(tileX, tileY, this.optionPaintTerrain);
             }
         }
     }
@@ -218,12 +225,8 @@ public class ToolBoard extends Tool
     
     private void renderContentBoard(Graphics g)
     {
-        //this.boardFileObject.render(g, this.getAreaBoard(), this.boardOffsetX, this.boardOffsetY);
-        
-        // TEMP
-        Tileset tileset = new Tileset("Mushroom", "TEST", "TEST", 32);
-        Drawing.drawImage(g, tileset.getTileAt(0, 0), this.getAreaBoard().x, this.getAreaBoard().y);
-        Drawing.drawImage(g, tileset.getTileAt(this.tempTile, 0), this.getAreaBoard().x + 32, this.getAreaBoard().y);
+        // Terrain
+        if(this.boardFileActive) {this.boardFileObject.render(g, this.getAreaBoard(), this.boardOffsetX, this.boardOffsetY);}
         
         // Border
         if(this.optionViewRuler) {Drawing.drawRect(g, this.getAreaBoard(), "BLACK");}
@@ -251,13 +254,13 @@ public class ToolBoard extends Tool
         this.modalObject.render(g);
     }
     
-    private void setModal()
+    public void modal()
     {
         this.modalActive = false;
         this.modalObject = null;
     }
     
-    private void setModal(Modal modal)
+    public void modal(FileBrowser modal)
     {
         this.modalActive = true;
         this.modalObject = modal;
@@ -272,7 +275,21 @@ public class ToolBoard extends Tool
     {
         if(item.getRef().equals("FILE_NEW"))
         {
-            this.setModal(new ModalBoardNew());
+            // NOTE: need to create separate modals / filebrowser modal
+            //this.setModal(new ModalBoardNew());
+        }
+        if(item.getRef().equals("FILE_OPEN"))
+        {
+            // NOTE: open the filebrowser modal
+            
+            // TEMP
+            //this.modal(new FileBrowser("OPEN BOARD", this.getState().managerBoard.getBoardArray()));
+            this.fileOpen(this.getState().managerBoard.loadBoard("TEST"));
+        }
+        if(item.getRef().equals("FILE_SAVE"))
+        {
+            System.out.println("TOOL BOARD -> SAVE");
+            this.boardFileObject.save();
         }
         if(item.getRef().equals("VIEW_GRID"))
         {
@@ -343,6 +360,14 @@ public class ToolBoard extends Tool
     public void setPaint(ToolBoardPaint paint)
     {
         this.optionPaintType = paint;
+    }
+    
+    private void updateTitle()
+    {
+        String title = "BOARD EDITOR";
+        if(this.boardFileActive) {title += " - " + this.boardFileObject.getName();}
+        if(!this.boardFileSaved) {title += " *";}
+        this.setTitle(title);
     }
     
 }

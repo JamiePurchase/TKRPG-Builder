@@ -1,10 +1,12 @@
 package states;
 
 import app.Engine;
+import board.BoardManager;
 import config.Config;
 import config.ConfigManager;
 import gfx.Drawing;
 import items.Item;
+import items.ItemFile;
 import items.ItemManager;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
@@ -13,10 +15,12 @@ import projects.Project;
 import projects.ProjectManager;
 import tools.Tool;
 import tools.ToolBoard;
+import tools.ToolItem;
 import tools.ToolMain;
 import tools.ToolProject;
 import tools.ToolTileset;
 import tools.desktop.Desktop;
+import tools.focus.Focus;
 import tools.modal.Modal;
 import tools.modal.ModalAbout;
 import tools.modal.ModalConfig;
@@ -26,11 +30,16 @@ import tools.taskbar.TaskbarMenu;
 
 public class StateBuilder extends State
 {
+    // Builder
     private Project project;
     private Desktop desktop;
     private Modal desktopModal;
     private Taskbar taskbar;
     private TaskbarMenu taskMenu;
+    
+    // Managers
+    public BoardManager managerBoard;
+    public ItemManager managerItem;
     
     // Settings
     private Config configFile;
@@ -49,6 +58,9 @@ public class StateBuilder extends State
     private ArrayList<Tool> toolArray;
     private int toolFocus;
     
+    // Keyboard
+    private Focus focusElement;
+    
     public StateBuilder()
     {
         // Application Variables
@@ -63,6 +75,9 @@ public class StateBuilder extends State
         this.desktopModal = null;
         this.taskbar = new Taskbar(this);
         this.taskMenu = new TaskbarMenu(this);
+        
+        // Managers
+        //this.buildManager();
         
         // Settings
         this.configFile = ConfigManager.init();
@@ -81,9 +96,11 @@ public class StateBuilder extends State
         this.toolArray = new ArrayList();
         this.toolFocus = 0;
         
+        // Focus Element
+        this.focusElement = null;
+        
         // TEST
-        ItemManager itemManager = new ItemManager("Mushroom");
-        /*Item testSword = itemManager.loadItem("iron_sword");
+        /*ItemFile testSword = this.managerItem.loadItem("iron_sword");
         System.out.println("LOAD ITEM");
         System.out.println(testSword);
         System.out.println("");*/
@@ -107,6 +124,17 @@ public class StateBuilder extends State
     public void audioSound(String sound)
     {
         
+    }
+    
+    private void buildManager()
+    {
+        this.managerBoard = new BoardManager(this.project.getName());
+        this.managerItem = new ItemManager(this.project.getName());
+    }
+    
+    public Focus getFocus()
+    {
+        return this.focusElement;
     }
     
     public Project getProject()
@@ -142,27 +170,24 @@ public class StateBuilder extends State
 
     public void inputKeyPress(String key)
     {
-        //
+        System.out.println("STATE BUILDER -> INPUT KEY PRESS (" + key + ")");
     }
 
     public void inputKeyRelease(String key)
     {
-        //
+        System.out.println("STATE BUILDER -> INPUT KEY RELEASE (" + key + ")");
     }
 
     public void inputKeyType(String key)
     {
-        this.toolMain.inputKey(key);
+        System.out.println("STATE BUILDER -> INPUT KEY TYPE (" + key + ")");
+        // NOTE: shortcuts? other things? combintions of keys?
         
-        // TEMP
-        //this.setModal(new ModalProjectOpen(this));
+        // TEST
+        if(this.focusElement != null) {this.focusElement.inputKey(key);}
         
-        // TEMP
-        //this.toolInit(new ToolBoard(this));
-        //this.toolInit(new ToolItem(this));
-        //this.toolInit(new ToolCharacter(this));
-        //this.toolInit(new ToolTileset(this));
-        this.toolInit(new ToolProject(this));
+        // Tool Window
+        if(this.toolActive) {getToolFocus().inputKey(key);}
     }
 
     public void inputMouseClickL(MouseEvent e)
@@ -263,6 +288,12 @@ public class StateBuilder extends State
         }
     }
     
+    public void setFocus(Focus element)
+    {
+        this.focusElement = element;
+        this.focusElement.focus(true);
+    }
+    
     public void setModal()
     {
         this.desktopModal = null;
@@ -276,6 +307,7 @@ public class StateBuilder extends State
     public void setProject(Project project)
     {
         this.project = project;
+        this.buildManager();
         this.taskMenu.build();
     }
 
@@ -291,6 +323,15 @@ public class StateBuilder extends State
 
         // Open Board Tool
         else {this.toolInit(new ToolBoard(this));}
+    }
+    
+    public void toolActionItem()
+    {
+        // Switch to Item Tool
+        if(this.getToolOpen("ITM")) {this.toolFocus("ITM");}
+
+        // Open Item Tool
+        else {this.toolInit(new ToolItem(this));}
     }
     
     public void toolActionProject()
