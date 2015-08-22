@@ -6,6 +6,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import states.StateBuilder;
+import styles.Scheme;
 
 public class Desktop
 {
@@ -37,7 +38,7 @@ public class Desktop
     
     private void renderBackground(Graphics g)
     {
-        Drawing.fillRect(g, this.desktopArea, "DESKTOP_FILL");
+        Drawing.fillRect(g, this.desktopArea, Scheme.Colour("DESKTOP_FILL"));
     }
     
     private void renderItems(Graphics g)

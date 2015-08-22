@@ -7,6 +7,7 @@ import gfx.Text;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import styles.Scheme;
 
 public class TaskbarMenuItem
 {
@@ -55,7 +56,7 @@ public class TaskbarMenuItem
     
     private void renderHighlight(Graphics g, int pos)
     {
-        Drawing.fillRect(g, this.getArea(pos), "SECONDARY_FORE");
+        Drawing.fillRect(g, this.getArea(pos), Scheme.Colour("SECONDARY_FORE"));
     }
     
     private void renderIcon(Graphics g, int pos)

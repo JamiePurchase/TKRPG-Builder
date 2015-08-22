@@ -5,7 +5,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import states.StateBuilder;
-import tiles.Tileset;
+import styles.Scheme;
+import tiles.TilesetFile;
 import tools.modal.Modal;
 import tools.toolbar.Toolbar;
 import tools.toolbar.ToolbarItem;
@@ -14,7 +15,7 @@ public class ToolTileset extends Tool
 {
     // File
     private boolean tilesetActive, tilesetSaved;
-    private Tileset tilesetObject;
+    private TilesetFile tilesetObject;
     
     // Toolbar
     private Toolbar toolbar;
@@ -39,7 +40,7 @@ public class ToolTileset extends Tool
         this.modalObject = null;
     }
     
-    public ToolTileset(StateBuilder state, Tileset tileset)
+    public ToolTileset(StateBuilder state, TilesetFile tileset)
     {
         super(state, "TST", state.getToolNext(), "TILESET EDITOR", Drawing.getImage("icon/tool_board.png"));
         
@@ -61,7 +62,7 @@ public class ToolTileset extends Tool
         this.tilesetObject = null;
     }
     
-    private void fileOpen(Tileset tileset)
+    private void fileOpen(TilesetFile tileset)
     {
         this.tilesetActive = true;
         this.tilesetObject = tileset;
@@ -104,7 +105,7 @@ public class ToolTileset extends Tool
     
     private void renderModal(Graphics g)
     {
-        Drawing.fadeScreen(g, "FADE_GREEN");
+        Drawing.fadeScreen(g, Scheme.Colour("STANDARD_FADE"));
         this.modalObject.render(g);
     }
     

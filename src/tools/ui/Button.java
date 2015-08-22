@@ -6,6 +6,7 @@ import gfx.Text;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import styles.Scheme;
 
 public class Button
 {
@@ -27,7 +28,7 @@ public class Button
     public void render(Graphics g)
     {
         // Background
-        if(this.getArea().contains(Engine.getMousePoint())) {Drawing.fillRect(g, this.buttonArea, "SECONDARY_FORE");}
+        if(this.getArea().contains(Engine.getMousePoint())) {Drawing.fillRect(g, this.buttonArea, Scheme.Colour("SECONDARY_FORE"));}
         else {Drawing.fillRect(g, this.buttonArea, "STANDARD_FORE");}
         
         // Caption

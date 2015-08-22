@@ -1,5 +1,8 @@
 package tools.files;
 
+import app.Engine;
+import framework.files.FileItem;
+import gfx.Drawing;
 import gfx.Text;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -31,7 +34,7 @@ public class FileBrowser extends Modal
     
     private Rectangle getFileItemArea(int pos)
     {
-        return new Rectangle(360, (40 * pos) + 200, 32, 32);
+        return new Rectangle(350, (40 * pos) + 200, 250, 40);
     }
     
     public void inputClick(MouseEvent e)
@@ -73,10 +76,10 @@ public class FileBrowser extends Modal
     private void renderFileItem(Graphics g, int pos)
     {
         // Highlight
-        /*if(this.getFileRect(pos).contains(Engine.getMousePoint()))
+        if(this.getFileItemArea(pos).contains(Engine.getMousePoint()))
         {
-            Drawing.drawRect(g, this.getFileRect(pos), "STANDARD_FORE");
-        }*/
+            Drawing.drawRect(g, this.getFileItemArea(pos), "STANDARD_FORE");
+        }
         
         // Icon
         g.drawImage(this.browserItems.get(pos).getIcon(), 360, (40 * pos) + 200, null);

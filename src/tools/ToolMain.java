@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import states.StateBuilder;
+import styles.Scheme;
 import tools.modal.Modal;
 
 public class ToolMain extends Tool
@@ -51,13 +52,13 @@ public class ToolMain extends Tool
     private void renderInfo(Graphics g)
     {
         // Background
-        Drawing.fillRect(g, this.getInfoRect(), "SECONDARY_FORE");
+        Drawing.fillRect(g, this.getInfoRect(), Scheme.Colour("SECONDARY_FORE"));
         
         // Text
         Text.write(g, "HELLO", this.getInfoRect().x + 10, this.getInfoRect().y + 20, "LEFT", "INFOBAR", "BLACK");
         
         // Border
-        Drawing.drawRect(g, this.getInfoRect(), 5, "STANDARD_FORE");
+        Drawing.drawRect(g, this.getInfoRect(), 5, Scheme.Colour("STANDARD_FORE"));
     }
     
     public void tick()

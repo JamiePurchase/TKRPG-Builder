@@ -5,9 +5,9 @@ import gfx.Text;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import projects.Project;
+import projects.ProjectFile;
 import states.StateBuilder;
-import tiles.Tileset;
+import styles.Scheme;
 import tools.modal.Modal;
 import tools.toolbar.Toolbar;
 import tools.toolbar.ToolbarItem;
@@ -38,7 +38,7 @@ public class ToolProject extends Tool
         this.getProject().save();
     }
     
-    private Project getProject()
+    private ProjectFile getProject()
     {
         return this.getState().getProject();
     }
@@ -66,7 +66,7 @@ public class ToolProject extends Tool
     
     public void render(Graphics g)
     {
-        this.renderWindow(g, "STANDARD_BACK");
+        this.renderWindow(g, Scheme.Colour("STANDARD_BACK"));
         this.toolbar.render(g);
         this.renderContent(g);
     }
@@ -74,7 +74,7 @@ public class ToolProject extends Tool
     private void renderContent(Graphics g)
     {
         // Project Name
-        Text.write(g, this.getProject().getName(), 75, 125, "LEFT", "MESSAGE", "BLACK");
+        Text.write(g, this.getProject().getFileName(), 75, 125, "LEFT", "MESSAGE", "BLACK");
         
         // Project Info
         Text.write(g, this.getProject().getInfo(), 75, 175, "LEFT", "MESSAGE", "BLACK");

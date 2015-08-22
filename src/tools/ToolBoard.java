@@ -1,19 +1,21 @@
 package tools;
 
-import board.Board;
+import board.BoardFile;
 import board.BoardFile;
 import board.BoardManager;
-import board.Terrain;
+import board.BoardTerrain;
 import gfx.Drawing;
 import items.ItemFile;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import states.StateBuilder;
-import tiles.Tileset;
+import styles.Scheme;
 import tools.files.FileBrowser;
 import tools.modal.Modal;
 import tools.modal.ModalBoardNew;
+import tools.modal.ModalBoardSettings;
+import tools.modal.ModalTileset;
 import tools.toolbar.Toolbar;
 import tools.toolbar.ToolbarItem;
 
@@ -29,15 +31,17 @@ public class ToolBoard extends Tool
     // Board Display
     private int boardOffsetX, boardOffsetY;
     
-    // Modal
-    private boolean modalActive;
-    private Modal modalObject;
-    
     // Options
     private ToolBoardMode boardMode;
     private ToolBoardPaint optionPaintType;
-    private Terrain optionPaintTerrain;
+    private BoardTerrain optionPaintTerrain;
     private boolean optionViewGrid, optionViewRuler;
+    
+    // Modal
+    private boolean modalSettingsActive;
+    private Modal modalSettingsObject;
+    private boolean modalTilesetActive;
+    private ModalTileset modalTilesetObject;
     
     public ToolBoard(StateBuilder state)
     {
@@ -50,14 +54,16 @@ public class ToolBoard extends Tool
         this.boardOffsetX = 0;
         this.boardOffsetY = 0;
         
-        // Modal
-        this.modalActive = false;
-        this.modalObject = null;
-        
         // Mode
         this.boardMode = ToolBoardMode.TERRAIN;
         this.optionPaintType = ToolBoardPaint.BRUSH;
-        this.optionPaintTerrain = new Terrain("TEST", 2, 0);
+        this.optionPaintTerrain = new BoardTerrain(this.getState().managerTileset.loadTileset("TEST"), 2, 0);
+        
+        // Modal
+        this.modalSettingsActive = false;
+        this.modalSettingsObject = null;
+        this.modalTilesetActive = false;
+        this.modalTilesetObject = new ModalTileset(this, this.getState().managerTileset.loadTileset("TEST"));
         
         // Toolbar
         this.toolbarInit();
@@ -116,10 +122,22 @@ public class ToolBoard extends Tool
     
     public void inputClick(MouseEvent e)
     {
-        // Modal Active
-        if(this.modalActive)
+        // Settings Modal
+        if(this.modalSettingsActive)
         {
-            this.modalObject.inputClick(e);
+            this.modalSettingsObject.inputClick(e);
+            return;
+        }
+        
+        // Tileset Modal
+        if(this.modalTilesetActive)
+        {
+            BoardTerrain terrain = this.modalTilesetObject.inputClickFile(e);
+            if(terrain != null)
+            {
+                this.modalTilesetActive = false;
+                this.optionPaintTerrain = terrain;
+            }
             return;
         }
         
@@ -205,7 +223,8 @@ public class ToolBoard extends Tool
         this.renderWindow(g);
         this.toolbar.render(g);
         this.renderContent(g);
-        if(this.modalActive) {this.renderModal(g);}
+        if(this.modalSettingsActive) {this.renderModal(g, this.modalSettingsObject);}
+        if(this.modalTilesetActive) {this.renderModal(g, this.modalTilesetObject);}
     }
     
     private void renderContent(Graphics g)
@@ -234,36 +253,24 @@ public class ToolBoard extends Tool
     
     private void renderContentRuler(Graphics g)
     {
-        Drawing.fillRect(g, this.getAreaRuler(true), "STANDARD_BACK");
-        Drawing.fillRect(g, this.getAreaRuler(false), "STANDARD_BACK");
+        Drawing.fillRect(g, this.getAreaRuler(true), Scheme.Colour("STANDARD_BACK"));
+        Drawing.fillRect(g, this.getAreaRuler(false), Scheme.Colour("STANDARD_BACK"));
         Drawing.drawRect(g, this.getAreaRuler(true), "BLACK", false, true, true, false);
         Drawing.drawRect(g, this.getAreaRuler(false), "BLACK", false, true, true, false);
     }
     
     private void renderContentScroll(Graphics g)
     {
-        Drawing.fillRect(g, this.getAreaScroll(true), "STANDARD_BACK");
-        Drawing.fillRect(g, this.getAreaScroll(false), "STANDARD_BACK");
+        Drawing.fillRect(g, this.getAreaScroll(true), Scheme.Colour("STANDARD_BACK"));
+        Drawing.fillRect(g, this.getAreaScroll(false), Scheme.Colour("STANDARD_BACK"));
         Drawing.drawRect(g, this.getAreaScroll(true), "BLACK", true, true, true, false);
         Drawing.drawRect(g, this.getAreaScroll(false), "BLACK", false, true, true, true);
     }
     
-    private void renderModal(Graphics g)
+    private void renderModal(Graphics g, Modal modal)
     {
-        Drawing.fadeScreen(g, "FADE_GREEN");
-        this.modalObject.render(g);
-    }
-    
-    public void modal()
-    {
-        this.modalActive = false;
-        this.modalObject = null;
-    }
-    
-    public void modal(FileBrowser modal)
-    {
-        this.modalActive = true;
-        this.modalObject = modal;
+        Drawing.fadeScreen(g, Scheme.Colour("STANDARD_FADE"));
+        modal.render(g);
     }
     
     public void tick()
@@ -291,6 +298,12 @@ public class ToolBoard extends Tool
             System.out.println("TOOL BOARD -> SAVE");
             this.boardFileObject.save();
         }
+        if(item.getRef().equals("OPTIONS_STATS"))
+        {
+            this.modalSettingsActive = true;
+            this.modalSettingsObject = new ModalBoardSettings(this, this.boardFileObject);
+            return;
+        }
         if(item.getRef().equals("VIEW_GRID"))
         {
             if(this.optionViewGrid)
@@ -316,6 +329,10 @@ public class ToolBoard extends Tool
                 this.optionViewRuler = true;
                 this.toolbar.getButton("VIEW_RULER").setDisable(false);
             }
+        }
+        if(item.getRef().equals("TILE_SET"))
+        {
+            this.modalTilesetActive = true;
         }
     }
     
@@ -344,7 +361,7 @@ public class ToolBoard extends Tool
         this.toolbar.addButton("PAINT_CLONE", "board_clone", true);
         this.toolbar.addDivider();
         this.toolbar.addLabel("TILE");
-        //this.toolbar.addButton("TILE_SET", "board_tile", true);
+        this.toolbar.addButton("TILE_SET", "board_tile", true);
     }
     
     public void setOptionViewGrid(boolean value)

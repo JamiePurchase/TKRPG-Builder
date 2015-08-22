@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import styles.Scheme;
 
 public abstract class Modal
 {
@@ -60,13 +61,13 @@ public abstract class Modal
     public void renderModal(Graphics g)
     {
         // Tool Background
-        Drawing.fillRect(g, this.modalArea, "STANDARD_BACK");
+        Drawing.fillRect(g, this.modalArea, Scheme.Colour("STANDARD_BACK"));
         
         // Tool Border
-        Drawing.drawRect(g, this.modalArea, 5, "STANDARD_FORE");
+        Drawing.drawRect(g, this.modalArea, 5, Scheme.Colour("STANDARD_FORE"));
         
         // Titlebar
-        Drawing.fillRect(g, this.modalArea.x, this.modalArea.y, this.modalArea.width, 34, "STANDARD_FORE");
+        Drawing.fillRect(g, this.modalArea.x, this.modalArea.y, this.modalArea.width, 34, Scheme.Colour("STANDARD_FORE"));
         int titlePos = this.modalArea.x + 12;
         if(this.modalIcon != null)
         {

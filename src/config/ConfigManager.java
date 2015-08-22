@@ -12,7 +12,7 @@ public class ConfigManager
         return Engine.getAppVariable("BUILDER_PATH") + "Config/Config.tk7cfg";
     }
     
-    public static Config init()
+    public static ConfigFile init()
     {
         // Load existing config file
         if(FileService.findFile(getPath())) {return initLoad();}
@@ -21,10 +21,10 @@ public class ConfigManager
         return initCreate();
     }
     
-    private static Config initCreate()
+    private static ConfigFile initCreate()
     {
         // Create a config object
-        Config file = new Config(1);
+        ConfigFile file = new ConfigFile(1);
         
         // Save the config file
         file.save();
@@ -33,13 +33,13 @@ public class ConfigManager
         return file;
     }
     
-    private static Config initLoad()
+    private static ConfigFile initLoad()
     {
         // Load the config file
         ArrayList<String> data = FileService.loadFile(getPath());
         
         // Build the config object
-        return new Config(Integer.parseInt(data.get(0)));
+        return new ConfigFile(Integer.parseInt(data.get(0)));
     }
     
 }

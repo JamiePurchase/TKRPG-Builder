@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import styles.Scheme;
 
 public class Toolbar 
 {
@@ -99,7 +100,7 @@ public class Toolbar
     private void renderBar(Graphics g)
     {
         // Background
-        Drawing.fillRect(g, this.getAreaDraw(), "SECONDARY_FORE");
+        Drawing.fillRect(g, this.getAreaDraw(), Scheme.Colour("SECONDARY_FORE"));
         
         // Border
         Drawing.drawRect(g, this.getAreaDraw(), "BLACK");

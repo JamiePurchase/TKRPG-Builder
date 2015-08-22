@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import styles.Scheme;
 import tools.Tool;
 import tools.ui.Tooltip;
 
@@ -39,7 +40,7 @@ public class TaskbarItem
             // NOTE: may wish to make this part of the Application.jar and just pass in styles from this app
             //if(Engine.getMouseIdle() || Engine.getTooltipActive() == false) {this.renderTooltip(g);}
         }
-        Drawing.fillRect(g, this.getArea(position), fill);
+        Drawing.fillRect(g, this.getArea(position), Scheme.Colour(fill));
         
         // Icon
         g.drawImage(this.itemIcon, this.getArea(position).x + 10, 718, null);

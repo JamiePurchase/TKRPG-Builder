@@ -6,6 +6,7 @@ import gfx.Text;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import styles.Scheme;
 import tools.focus.Focus;
 
 public class Textbox extends Focus
@@ -26,6 +27,11 @@ public class Textbox extends Focus
         
         // TEMP
         this.focus(true);
+    }
+    
+    public Rectangle getArea()
+    {
+        return this.textboxArea;
     }
     
     public void inputKey(String key)
@@ -49,8 +55,8 @@ public class Textbox extends Focus
     public void render(Graphics g)
     {
         // Background
-        if(this.textboxArea.contains(Engine.getMousePoint()) || this.hasFocus()) {Drawing.fillRect(g, this.textboxArea, "SECONDARY_FORE");}
-        else {Drawing.fillRect(g, this.textboxArea, "STANDARD_BACK");}
+        if(this.textboxArea.contains(Engine.getMousePoint()) || this.hasFocus()) {Drawing.fillRect(g, this.textboxArea, Scheme.Colour("SECONDARY_FORE"));}
+        else {Drawing.fillRect(g, this.textboxArea, Scheme.Colour("STANDARD_BACK"));}
         
         // Value
         Text.write(g, this.textboxValue, this.textboxArea.x + 15, this.textboxArea.y + 22, "LEFT", "INPUT_STANDARD", "BLACK");

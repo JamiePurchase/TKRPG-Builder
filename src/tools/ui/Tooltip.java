@@ -5,6 +5,7 @@ import gfx.Text;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import styles.Scheme;
 
 public class Tooltip
 {
@@ -20,7 +21,7 @@ public class Tooltip
     public void render(Graphics g)
     {
         // Background
-        Drawing.fillRect(g, this.tooltipRect, "STANDARD_FORE");
+        Drawing.fillRect(g, this.tooltipRect, Scheme.Colour("STANDARD_FORE"));
         
         // Text
         Text.write(g, this.tooltipValue, this.tooltipRect.x + (this.tooltipRect.width / 2), this.tooltipRect.y + 20, "CENTER", "TOOLTIP", "BLACK");

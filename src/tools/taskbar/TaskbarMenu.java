@@ -11,7 +11,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import states.StateBuilder;
 import states.StateExit;
-import tools.modal.ModalProjectOpen;
+import styles.Scheme;
 
 public class TaskbarMenu
 {
@@ -44,6 +44,7 @@ public class TaskbarMenu
             this.menuItems.add(new TaskbarMenuItem(this, "PRO", "PROJECT SETTINGS", "file_new"));
             this.menuItems.add(new TaskbarMenuItem(this, "BRD", "BOARD EDITOR", "file_new"));
             this.menuItems.add(new TaskbarMenuItem(this, "ITM", "ITEM EDITOR", "file_new"));
+            this.menuItems.add(new TaskbarMenuItem(this, "LVA", "LAVA EDITOR", "file_new"));
         }
         
         // Standard Options
@@ -87,7 +88,8 @@ public class TaskbarMenu
         }
         
         // Open Project
-        if(ref.equals("OPEN")) {this.state.setModal(new ModalProjectOpen(this.state));}
+        //if(ref.equals("OPEN")) {this.state.setModal(new ModalProjectOpen(this.state));}
+        // NOTE: need to create a fileBrowser to handle this
         
         // Project Settings
         if(ref.equals("PRO")) {this.state.toolActionProject();}
@@ -97,6 +99,9 @@ public class TaskbarMenu
         
         // Item Editor
         if(ref.equals("ITM")) {this.state.toolActionItem();}
+        
+        // Lava Editor
+        if(ref.equals("LVA")) {this.state.toolActionLava();}
         
         // Settings
         if(ref.equals("CONFIG")) {state.actionConfig(true);}
@@ -116,7 +121,7 @@ public class TaskbarMenu
     public void render(Graphics g)
     {
         // Background
-        Drawing.fillRect(g, this.getArea(), "STANDARD_FORE");
+        Drawing.fillRect(g, this.getArea(), Scheme.Colour("STANDARD_FORE"));
         
         // Items
         for(int x = 0; x < this.menuItems.size(); x++)

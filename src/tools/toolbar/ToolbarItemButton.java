@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import styles.Scheme;
 
 public class ToolbarItemButton extends ToolbarItem
 {
@@ -38,6 +39,11 @@ public class ToolbarItemButton extends ToolbarItem
     
     public void render(Graphics g)
     {
+        // Fill
+        String fill = "SECONDARY_FORE";
+        if(this.getButtonRect().contains(Engine.getMousePoint())) {fill = "STANDARD_BACK";}
+        Drawing.fillRect(g, this.getButtonRect(), Scheme.Colour(fill));
+        
         // Image
         if(this.buttonDisable) {Drawing.drawImageOpaque(g, this.buttonImage, this.getButtonRect().x, this.getButtonRect().y, 0.3f);}
         else {g.drawImage(this.buttonImage, this.getButtonRect().x, this.getButtonRect().y, null);}

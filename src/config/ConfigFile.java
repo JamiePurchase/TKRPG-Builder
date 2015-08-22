@@ -3,11 +3,11 @@ package config;
 import file.FileService;
 import java.util.ArrayList;
 
-public class Config
+public class ConfigFile
 {
     private int configScheme;
     
-    public Config(int scheme)
+    public ConfigFile(int scheme)
     {
         this.configScheme = scheme;
     }

@@ -37,7 +37,7 @@ public class ModalBoardNew extends Modal
     
     private void renderOptions(Graphics g)
     {
-        /*g.setColor(Colour.getColour("SECONDARY_FORE"));
+        /*g.setColor(Scheme.Colour("SECONDARY_FORE"));
         g.drawRect(600, 250, 200, 50);*/
     }
     

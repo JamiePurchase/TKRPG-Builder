@@ -7,8 +7,9 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import states.StateBuilder;
+import styles.Scheme;
 import tools.files.FileBrowser;
-import tools.files.FileItem;
+import framework.files.FileItem;
 import tools.modal.Modal;
 import tools.toolbar.Toolbar;
 import tools.toolbar.ToolbarItem;
@@ -120,7 +121,7 @@ public class ToolItem extends Tool
     
     public void render(Graphics g)
     {
-        this.renderWindow(g, "STANDARD_BACK");
+        this.renderWindow(g, Scheme.Colour("STANDARD_BACK"));
         this.toolbar.render(g);
         if(this.itemFileActive) {this.renderContent(g);}
         if(this.modalActive) {this.modalObject.render(g);}

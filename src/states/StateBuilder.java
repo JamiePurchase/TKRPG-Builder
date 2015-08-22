@@ -2,20 +2,23 @@ package states;
 
 import app.Engine;
 import board.BoardManager;
-import config.Config;
+import config.ConfigFile;
 import config.ConfigManager;
 import gfx.Drawing;
-import items.Item;
 import items.ItemFile;
 import items.ItemManager;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import projects.Project;
+import lava.LavaManager;
+import projects.ProjectFile;
 import projects.ProjectManager;
+import styles.Scheme;
+import tiles.TilesetManager;
 import tools.Tool;
 import tools.ToolBoard;
 import tools.ToolItem;
+import tools.ToolLava;
 import tools.ToolMain;
 import tools.ToolProject;
 import tools.ToolTileset;
@@ -31,7 +34,7 @@ import tools.taskbar.TaskbarMenu;
 public class StateBuilder extends State
 {
     // Builder
-    private Project project;
+    private ProjectFile project;
     private Desktop desktop;
     private Modal desktopModal;
     private Taskbar taskbar;
@@ -40,9 +43,11 @@ public class StateBuilder extends State
     // Managers
     public BoardManager managerBoard;
     public ItemManager managerItem;
+    public LavaManager managerLava;
+    public TilesetManager managerTileset;
     
     // Settings
-    private Config configFile;
+    private ConfigFile configFile;
     private boolean configActive;
     private ModalConfig configModal;
     
@@ -65,6 +70,8 @@ public class StateBuilder extends State
     {
         // Application Variables
         Engine.setAppVariable("BUILDER_PATH", "C:/Users/Jamie/Documents/My Workshop/Java/TKRPG/Builder/");
+        Engine.setAppVariable("BUILDER_SCHEME", "DEFAULT");
+        //Engine.setAppVariable("BUILDER_SCHEME", "MYSTIC");
         
         // TEMP
         //ProjectManager.createProject("Mushroom");
@@ -128,8 +135,10 @@ public class StateBuilder extends State
     
     private void buildManager()
     {
-        this.managerBoard = new BoardManager(this.project.getName());
-        this.managerItem = new ItemManager(this.project.getName());
+        this.managerBoard = new BoardManager(this, this.project.getName());
+        this.managerItem = new ItemManager(this, this.project.getName());
+        this.managerLava = new LavaManager(this, this.project.getName());
+        this.managerTileset = new TilesetManager(this, this.project.getName());
     }
     
     public Focus getFocus()
@@ -137,7 +146,7 @@ public class StateBuilder extends State
         return this.focusElement;
     }
     
-    public Project getProject()
+    public ProjectFile getProject()
     {
         return this.project;
     }
@@ -276,14 +285,14 @@ public class StateBuilder extends State
         // Settings
         if(this.configActive)
         {
-            Drawing.fadeScreen(g, "FADE_GREEN");
+            Drawing.fadeScreen(g, Scheme.Colour("STANDARD_FADE"));
             this.configModal.render(g);
         }
         
         // About
         if(this.aboutActive)
         {
-            Drawing.fadeScreen(g, "FADE_GREEN");
+            Drawing.fadeScreen(g, Scheme.Colour("STANDARD_FADE"));
             this.aboutModal.render(g);
         }
     }
@@ -304,7 +313,7 @@ public class StateBuilder extends State
         this.desktopModal = modal;
     }
     
-    public void setProject(Project project)
+    public void setProject(ProjectFile project)
     {
         this.project = project;
         this.buildManager();
@@ -332,6 +341,15 @@ public class StateBuilder extends State
 
         // Open Item Tool
         else {this.toolInit(new ToolItem(this));}
+    }
+    
+    public void toolActionLava()
+    {
+        // Switch to Lava Tool
+        if(this.getToolOpen("LVA")) {this.toolFocus("LVA");}
+
+        // Open Lava Tool
+        else {this.toolInit(new ToolLava(this));}
     }
     
     public void toolActionProject()
@@ -369,6 +387,11 @@ public class StateBuilder extends State
         this.toolArray.add(tool);
         this.toolFocus = tool.getToolID();
         this.taskbar.addItem(tool.getTaskbarItem());
+    }
+    
+    private void zTest()
+    {
+        //
     }
     
 }
