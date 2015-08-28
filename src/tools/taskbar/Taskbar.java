@@ -119,10 +119,13 @@ public class Taskbar
     private void inputClickProject()
     {
         // No Project
-        //if(this.state.getProject() == null) {this.state.setModal(new FileBrowser("OPEN PROJECT", this.state.managerProject.loadProjectArray()));}
+        if(this.state.getProject() == null)
+        {
+            this.state.setProjectBrowser(new FileBrowser("OPEN PROJECT", this.state.managerProject.getProjectArray()));
+        }
         
         // Project Loaded
-        //else {this.state.toolActionProject();}
+        else {this.state.toolActionProject();}
     }
     
     private void inputClickTray(MouseEvent e)

@@ -20,14 +20,26 @@ public class Desktop
         this.desktopItems = new ArrayList();
     }
     
+    public void addItem(DesktopItem item)
+    {
+        this.desktopItems.add(item);
+    }
+    
     public Rectangle getArea()
     {
         return this.desktopArea;
     }
     
-    public void inputClick(MouseEvent e)
+    public String inputClick(MouseEvent e)
     {
-        //
+        for(int x = 0; x < this.desktopItems.size(); x++)
+        {
+            if(this.desktopItems.get(x).getRect(x).contains(e.getPoint()))
+            {
+                return desktopItems.get(x).getRef();
+            }
+        }
+        return null;
     }
     
     public void render(Graphics g)
@@ -43,7 +55,10 @@ public class Desktop
     
     private void renderItems(Graphics g)
     {
-        
+        for(int x = 0; x < this.desktopItems.size(); x++)
+        {
+            this.desktopItems.get(x).render(g, x);
+        }
     }
     
     public void tick()

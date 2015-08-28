@@ -4,6 +4,7 @@ import app.Engine;
 import board.BoardManager;
 import config.ConfigFile;
 import config.ConfigManager;
+import framework.files.FileItem;
 import gfx.Drawing;
 import items.ItemFile;
 import items.ItemManager;
@@ -23,6 +24,8 @@ import tools.ToolMain;
 import tools.ToolProject;
 import tools.ToolTileset;
 import tools.desktop.Desktop;
+import tools.desktop.DesktopItem;
+import tools.files.FileBrowser;
 import tools.focus.Focus;
 import tools.modal.Modal;
 import tools.modal.ModalAbout;
@@ -44,7 +47,12 @@ public class StateBuilder extends State
     public BoardManager managerBoard;
     public ItemManager managerItem;
     public LavaManager managerLava;
+    public ProjectManager managerProject;
     public TilesetManager managerTileset;
+    
+    // Project Browser
+    public boolean projectBrowserActive;
+    public FileBrowser projectBrowserModal;
     
     // Settings
     private ConfigFile configFile;
@@ -75,6 +83,7 @@ public class StateBuilder extends State
         
         // TEMP
         //ProjectManager.createProject("Mushroom");
+        this.managerProject = new ProjectManager(this, "Mushroom");
         
         // NOTE: we should load a text file to determine which project was last open
         this.project = null;
@@ -85,6 +94,10 @@ public class StateBuilder extends State
         
         // Managers
         //this.buildManager();
+        
+        // Project Browser
+        this.projectBrowserActive = false;
+        this.projectBrowserModal = null;
         
         // Settings
         this.configFile = ConfigManager.init();
@@ -108,9 +121,21 @@ public class StateBuilder extends State
         
         // TEST
         /*ItemFile testSword = this.managerItem.loadItem("iron_sword");
-        System.out.println("LOAD ITEM");
-        System.out.println(testSword);
-        System.out.println("");*/
+            System.out.println("LOAD ITEM");
+            System.out.println(testSword);
+            System.out.println("");*/
+        
+        // TEMP
+        this.desktop.addItem(new DesktopItem("TEST1", "TEST1", Drawing.getImage("icon/tool_board.png")));
+        this.desktop.addItem(new DesktopItem("TEST2", "TEST2", Drawing.getImage("icon/tool_board.png")));
+        this.desktop.addItem(new DesktopItem("TEST3", "TEST3", Drawing.getImage("icon/tool_board.png")));
+        this.desktop.addItem(new DesktopItem("TEST4", "TEST4", Drawing.getImage("icon/tool_board.png")));
+        this.desktop.addItem(new DesktopItem("TEST5", "TEST5", Drawing.getImage("icon/tool_board.png")));
+        this.desktop.addItem(new DesktopItem("TEST6", "TEST6", Drawing.getImage("icon/tool_board.png")));
+        this.desktop.addItem(new DesktopItem("TEST7", "TEST7", Drawing.getImage("icon/tool_board.png")));
+        this.desktop.addItem(new DesktopItem("TEST8", "TEST8", Drawing.getImage("icon/tool_board.png")));
+        this.desktop.addItem(new DesktopItem("TEST9", "TEST9", Drawing.getImage("icon/tool_board.png")));
+        this.desktop.addItem(new DesktopItem("TEST10", "TEST10", Drawing.getImage("icon/tool_board.png")));
     }
     
     public void actionAbout(boolean active)
@@ -232,6 +257,20 @@ public class StateBuilder extends State
                 return;
             }
             
+            // Project Browser
+            if(this.projectBrowserActive)
+            {
+                if(this.projectBrowserModal.getArea().contains(e.getPoint()))
+                {
+                    FileItem file = this.projectBrowserModal.inputClickFile(e);
+                    if(file != null)
+                    {
+                        this.setProject(this.managerProject.getProject(file));
+                        this.setProjectBrowser(null);
+                    }
+                }
+            }
+            
             // Taskbar
             if(this.taskbar.getTaskbarRect().contains(e.getPoint()))
             {
@@ -243,7 +282,17 @@ public class StateBuilder extends State
             if(this.toolActive) {getToolFocus().inputClick(e);}
             
             // Desktop
-            else {if(this.desktop.getArea().contains(e.getPoint())) {this.desktop.inputClick(e);}}
+            else
+            {
+                if(this.desktop.getArea().contains(e.getPoint()))
+                {
+                    String ref = this.desktop.inputClick(e);
+                    if(ref != null)
+                    {
+                        // NOTE: do something
+                    }
+                }
+            }
         }
     }
 
@@ -272,6 +321,7 @@ public class StateBuilder extends State
         
         this.taskbar.render(g);
         //this.toolMain.render(g);
+        if(this.projectBrowserActive) {this.projectBrowserModal.render(g);}
         if(this.toolActive) {this.getToolFocus().render(g);}
         if(this.taskMenu.isActive()) {this.taskMenu.render(g);}
         if(this.desktopModal != null) {this.desktopModal.render(g);}
@@ -318,6 +368,20 @@ public class StateBuilder extends State
         this.project = project;
         this.buildManager();
         this.taskMenu.build();
+    }
+    
+    public void setProjectBrowser(FileBrowser browser)
+    {
+        if(browser != null)
+        {
+            this.projectBrowserActive = true;
+            this.projectBrowserModal = browser;
+        }
+        else
+        {
+            this.projectBrowserActive = false;
+            this.projectBrowserModal = null;
+        }
     }
 
     public void tick()
