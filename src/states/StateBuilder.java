@@ -135,10 +135,10 @@ public class StateBuilder extends State
     
     private void buildManager()
     {
-        this.managerBoard = new BoardManager(this, this.project.getName());
-        this.managerItem = new ItemManager(this, this.project.getName());
-        this.managerLava = new LavaManager(this, this.project.getName());
-        this.managerTileset = new TilesetManager(this, this.project.getName());
+        this.managerBoard = new BoardManager(this, this.project.getFileName());
+        this.managerItem = new ItemManager(this, this.project.getFileName());
+        this.managerLava = new LavaManager(this, this.project.getFileName());
+        this.managerTileset = new TilesetManager(this, this.project.getFileName());
     }
     
     public Focus getFocus()
