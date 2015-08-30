@@ -5,12 +5,16 @@ import board.BoardFile;
 import board.BoardFile;
 import board.BoardManager;
 import board.BoardTerrain;
+import board.Direction;
+import debug.Console;
 import gfx.Drawing;
 import gfx.Text;
 import items.ItemFile;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import states.StateBuilder;
 import styles.Scheme;
 import tools.board.ModalStats;
@@ -42,6 +46,7 @@ public class ToolBoard extends Tool
     private BoardTerrain optionPaintTerrain;
     private ToolEntity optionEntityType;
     private ToolZone optionZoneType;
+    private ArrayList<String> optionZoneDrawPoints;
     private ToolLighting optionLightingType;
     private boolean optionViewGrid, optionViewRuler;
     
@@ -73,6 +78,7 @@ public class ToolBoard extends Tool
         this.optionPaintTerrain = new BoardTerrain(this.getState().getManager().Tileset().loadTileset("TEST"), 2, 0);
         this.optionEntityType = ToolEntity.SELECT;
         this.optionZoneType = ToolZone.SELECT;
+        this.optionZoneDrawPoints = new ArrayList();
         this.optionLightingType = ToolLighting.SELECT;
         
         // Settings Modal
@@ -118,9 +124,9 @@ public class ToolBoard extends Tool
     {
         if(this.optionViewRuler)
         {
-            return new Rectangle(this.getToolRectContent().x + 32, this.getToolRectContent().y + 32, this.getToolRectContent().width - 64, this.getToolRectContent().height - 64);
+            return new Rectangle(this.getToolRectContent().x + 32, this.getToolRectContent().y + 32, this.getToolRectContent().width - 64, this.getToolRectContent().height - 96);
         }
-        else {return new Rectangle(this.getToolRectContent().x, this.getToolRectContent().y, this.getToolRectContent().width - 32, this.getToolRectContent().height - 32);}
+        else {return new Rectangle(this.getToolRectContent().x, this.getToolRectContent().y, this.getToolRectContent().width - 32, this.getToolRectContent().height - 64);}
     }
     
     private Rectangle getAreaRuler(boolean horizontal)
@@ -131,8 +137,23 @@ public class ToolBoard extends Tool
     
     private Rectangle getAreaScroll(boolean horizontal)
     {
-        if(horizontal) {return new Rectangle(this.getToolRectContent().x, getToolRectContent().y + getToolRectContent().height - 32, getToolRectContent().width, 32);}
-        return new Rectangle(this.getToolRectContent().x + this.getToolRectContent().width - 32, getToolRectContent().y, 32, getToolRectContent().height);
+        if(horizontal) {return new Rectangle(this.getToolRectContent().x, getToolRectContent().y + getToolRectContent().height - 64, getToolRectContent().width - 32, 32);}
+        return new Rectangle(this.getToolRectContent().x + this.getToolRectContent().width - 32, getToolRectContent().y, 32, getToolRectContent().height - 64);
+    }
+    
+    private Rectangle getAreaScrollArrow(Direction face)
+    {
+        if(face == Direction.EAST) {return new Rectangle(this.getAreaScroll(true).x + this.getAreaScroll(true).width - 32, this.getAreaScroll(true).y, 32, 32);}
+        if(face == Direction.NORTH) {return new Rectangle(this.getAreaScroll(false).x, this.getAreaScroll(false).y - 1, 32, 32);}
+        if(face == Direction.SOUTH) {return new Rectangle(this.getAreaScroll(false).x, this.getAreaScroll(false).y + this.getAreaScroll(false).height - 32, 32, 32);}
+        if(face == Direction.WEST) {return new Rectangle(this.getAreaScroll(true).x - 1, this.getAreaScroll(true).y, 32, 32);}
+        return null;
+    }
+    
+    private Rectangle getAreaScrollBar(boolean horizontal)
+    {
+        if(horizontal) {return new Rectangle(this.getAreaScroll(true).x + 32, this.getAreaScroll(true).y, this.getAreaScroll(true).width - 64, this.getAreaScroll(true).height);}
+        return new Rectangle(this.getAreaScroll(false).x, this.getAreaScroll(false).y + 32, this.getAreaScroll(false).width, this.getAreaScroll(false).height - 64);
     }
     
     private Rectangle getAreaStatus()
@@ -269,7 +290,40 @@ public class ToolBoard extends Tool
     
     private void inputClickBoardTileZone(int tileX, int tileY)
     {
-        //
+        // Select
+        if(this.optionZoneType == ToolZone.SELECT)
+        {
+            // Did we click on a zone?
+        }
+        
+        // Draw
+        if(this.optionZoneType == ToolZone.DRAW)
+        {
+            // Clicked on an existing point (revisit this later)
+            for(int x = 0; x < this.optionZoneDrawPoints.size(); x++)
+            {
+                // TO BE DONE (put some rules in)
+                // cannot create a polugon with less than three points
+                // can only end a polygon on the first point
+                if(this.optionZoneDrawPoints.get(x).equals(tileX + "|" + tileY))
+                {
+                    // TO BE DONE (create the zone)
+                    // convert the tile pairs into polygon points
+                    // create the zone and add it to the board
+                    this.optionZoneDrawPoints = new ArrayList();
+                    return;
+                }
+            }
+            
+            // Add this tile to the zone creation points
+            this.optionZoneDrawPoints.add(tileX + "|" + tileY);
+        }
+        
+        // Delete
+        if(this.optionZoneType == ToolZone.DELETE)
+        {
+            // Did we click on a zone?
+        }
     }
     
     private void inputClickScrollH(MouseEvent e)
@@ -314,6 +368,9 @@ public class ToolBoard extends Tool
         // Board
         this.renderContentBoard(g);
         
+        // Zones
+        if(this.boardMode == ToolMode.ZONE) {this.renderContentZone(g);}
+        
         // Status
         this.renderStatus(g);
     }
@@ -337,10 +394,46 @@ public class ToolBoard extends Tool
     
     private void renderContentScroll(Graphics g)
     {
+        // Background
         Drawing.fillRect(g, this.getAreaScroll(true), Scheme.Colour("STANDARD_BACK"));
         Drawing.fillRect(g, this.getAreaScroll(false), Scheme.Colour("STANDARD_BACK"));
+        
+        // Arrow Images
+        Drawing.drawImage(g, Drawing.getImage("icon/scrollbar_arrow_E.png"), this.getAreaScroll(true).x + this.getAreaScroll(true).width - 32, this.getAreaScroll(true).y);
+        Drawing.drawImage(g, Drawing.getImage("icon/scrollbar_arrow_N.png"), this.getAreaScroll(false).x, this.getAreaScroll(false).y);
+        Drawing.drawImage(g, Drawing.getImage("icon/scrollbar_arrow_S.png"), this.getAreaScroll(false).x, this.getAreaScroll(false).y + this.getAreaScroll(false).height - 32);
+        Drawing.drawImage(g, Drawing.getImage("icon/scrollbar_arrow_W.png"), this.getAreaScroll(true).x, this.getAreaScroll(true).y);
+        
+        // Arrow Borders
+        Drawing.drawRect(g, this.getAreaScrollArrow(Direction.EAST), Color.BLACK);
+        Drawing.drawRect(g, this.getAreaScrollArrow(Direction.NORTH), Color.BLACK);
+        Drawing.drawRect(g, this.getAreaScrollArrow(Direction.SOUTH), Color.BLACK);
+        Drawing.drawRect(g, this.getAreaScrollArrow(Direction.WEST), Color.BLACK);
+        
+        //  TEST
+        Drawing.fillRect(g, this.getAreaScrollBar(true), Color.BLUE);
+        Drawing.fillRect(g, this.getAreaScrollBar(false), Color.BLUE);
+            
+        // Border
         Drawing.drawRect(g, this.getAreaScroll(true), "BLACK", true, true, true, false);
         Drawing.drawRect(g, this.getAreaScroll(false), "BLACK", false, true, true, true);
+    }
+    
+    private void renderContentZone(Graphics g)
+    {
+        // NOTE: draw all zones on the board
+        
+        // Draw zone creation points
+        if(this.optionZoneType == ToolZone.DRAW && this.optionZoneDrawPoints.size() > 0)
+        {
+            for(int x = 0; x < this.optionZoneDrawPoints.size(); x++)
+            {
+                int tileX = Integer.parseInt(this.optionZoneDrawPoints.get(x).split("\\|")[0]);
+                int tileY = Integer.parseInt(this.optionZoneDrawPoints.get(x).split("\\|")[1]);
+                // NOTE: draw a point in the corner of tileX,tileY
+                Drawing.drawImage(g, Drawing.getImage("icon/board_delete.png"), this.getAreaBoard().x + (32 * tileX) - this.boardOffsetX, this.getAreaBoard().y + (32 * tileY) - this.boardOffsetY);
+            }
+        }
     }
     
     private void renderModal(Graphics g, Modal modal)
@@ -666,6 +759,11 @@ public class ToolBoard extends Tool
         if(this.boardMode == ToolMode.ENTITY) {this.toolbarInitEntities();}
         if(this.boardMode == ToolMode.ZONE) {this.toolbarInitZones();}
         if(this.boardMode == ToolMode.LIGHTING) {this.toolbarInitLighting();}
+        
+        // NOTE: it may be worth adding a secondary toolbar that can be toggled on/off
+        // extra tools such as adding new cols/rows in-front of board and shifting everything along would be nice
+        // NOTE: you should be able to edit entities by simply following a link in the board editor
+        // eg: treasure chests would allow you to sort out the items they may hold
     }
     
     private void toolbarInitEntities()
