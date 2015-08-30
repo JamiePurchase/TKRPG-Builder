@@ -89,12 +89,13 @@ public class ToolItem extends Tool
             if(file != null)
             {
                 this.modal();
-                this.fileOpen(this.getState().managerItem.loadItem(file.getPath()));
+                this.fileOpen(this.getState().getManager().Item().loadItem(file.getPath()));
             }
             return;
         }
         
-        // Close Button ?? done in superclass?
+        // Close Button
+        if(this.getCloseRect().contains(e.getPoint())) {this.inputClickClose();}
         
         // Toolbar (should check if toolbar area contains e point)
         ToolbarItem click = this.toolbar.inputClick(e);
@@ -158,7 +159,7 @@ public class ToolItem extends Tool
             
             // TEMP
             //ArrayList<FileItem> fileItems =
-            this.modal(new FileBrowser("OPEN ITEM", this.getState().managerItem.getItemArray()));
+            this.modal(new FileBrowser("OPEN ITEM", this.getState().getManager().Item().getItemArray()));
         }
         if(item.getRef().equals("FILE_SAVE"))
         {

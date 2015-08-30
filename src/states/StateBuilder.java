@@ -1,28 +1,24 @@
 package states;
 
 import app.Engine;
-import board.BoardManager;
 import config.ConfigFile;
 import config.ConfigManager;
+import debug.Console;
 import framework.files.FileItem;
+import framework.files.FileManager;
 import gfx.Drawing;
-import items.ItemFile;
-import items.ItemManager;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import lava.LavaManager;
 import projects.ProjectFile;
 import projects.ProjectManager;
 import styles.Scheme;
-import tiles.TilesetManager;
 import tools.Tool;
 import tools.ToolBoard;
 import tools.ToolItem;
 import tools.ToolLava;
 import tools.ToolMain;
 import tools.ToolProject;
-import tools.ToolTileset;
 import tools.desktop.Desktop;
 import tools.desktop.DesktopItem;
 import tools.files.FileBrowser;
@@ -43,13 +39,6 @@ public class StateBuilder extends State
     private Taskbar taskbar;
     private TaskbarMenu taskMenu;
     
-    // Managers
-    public BoardManager managerBoard;
-    public ItemManager managerItem;
-    public LavaManager managerLava;
-    public ProjectManager managerProject;
-    public TilesetManager managerTileset;
-    
     // Project Browser
     public boolean projectBrowserActive;
     public FileBrowser projectBrowserModal;
@@ -62,9 +51,6 @@ public class StateBuilder extends State
     // About
     private boolean aboutActive;
     private ModalMessage aboutModal;
-    
-    // TEMP
-    private ToolMain toolMain;
     
     // Tool Windows
     private boolean toolActive;
@@ -81,10 +67,6 @@ public class StateBuilder extends State
         Engine.setAppVariable("BUILDER_SCHEME", "DEFAULT");
         //Engine.setAppVariable("BUILDER_SCHEME", "MYSTIC");
         
-        // TEMP
-        //ProjectManager.createProject("Mushroom");
-        this.managerProject = new ProjectManager(this, "Mushroom");
-        
         // NOTE: we should load a text file to determine which project was last open
         this.project = null;
         this.desktop = new Desktop(this);
@@ -93,7 +75,7 @@ public class StateBuilder extends State
         this.taskMenu = new TaskbarMenu(this);
         
         // Managers
-        //this.buildManager();
+        this.initManager();
         
         // Project Browser
         this.projectBrowserActive = false;
@@ -107,9 +89,6 @@ public class StateBuilder extends State
         // About
         this.aboutActive = false;
         this.aboutModal = new ModalAbout(this);
-        
-        // TEMP
-        this.toolMain = new ToolMain(this);
         
         // Tool Windows
         this.toolActive = false;
@@ -136,6 +115,9 @@ public class StateBuilder extends State
         this.desktop.addItem(new DesktopItem("TEST8", "TEST8", Drawing.getImage("icon/tool_board.png")));
         this.desktop.addItem(new DesktopItem("TEST9", "TEST9", Drawing.getImage("icon/tool_board.png")));
         this.desktop.addItem(new DesktopItem("TEST10", "TEST10", Drawing.getImage("icon/tool_board.png")));
+        
+        // TEST
+        this.zTest();
     }
     
     public void actionAbout(boolean active)
@@ -158,17 +140,14 @@ public class StateBuilder extends State
         
     }
     
-    private void buildManager()
-    {
-        this.managerBoard = new BoardManager(this, this.project.getFileName());
-        this.managerItem = new ItemManager(this, this.project.getFileName());
-        this.managerLava = new LavaManager(this, this.project.getFileName());
-        this.managerTileset = new TilesetManager(this, this.project.getFileName());
-    }
-    
     public Focus getFocus()
     {
         return this.focusElement;
+    }
+    
+    public FileManager getManager()
+    {
+        return (FileManager) Engine.getAppVariable("ENGINE_MANAGER");
     }
     
     public ProjectFile getProject()
@@ -190,7 +169,11 @@ public class StateBuilder extends State
     public int getToolNext()
     {
         if(this.toolArray == null) {return 0;}
-        return this.toolArray.size();
+        //return this.toolArray.size();
+        
+        int tool = this.toolFocus + 1;
+        if(tool >= this.toolArray.size()) {tool = 0;}
+        return tool;
     }
     
     public boolean getToolOpen(String ref)
@@ -200,6 +183,12 @@ public class StateBuilder extends State
             if(this.toolArray.get(x).getToolRef().equals(ref)) {return true;}
         }
         return false;
+    }
+    
+    private void initManager()
+    {
+        if(this.project != null) {Engine.setAppVariable("ENGINE_MANAGER", new FileManager(this.project.getFileName()));}
+        else {Engine.setAppVariable("ENGINE_MANAGER", null);}
     }
 
     public void inputKeyPress(String key)
@@ -265,7 +254,7 @@ public class StateBuilder extends State
                     FileItem file = this.projectBrowserModal.inputClickFile(e);
                     if(file != null)
                     {
-                        this.setProject(this.managerProject.getProject(file));
+                        this.setProject(ProjectManager.getProject(file));
                         this.setProjectBrowser(null);
                     }
                 }
@@ -310,7 +299,7 @@ public class StateBuilder extends State
     public void projectUpdate()
     {
         // NOTE: need to call this EVERY TIME something is saved within the project
-        this.getProject().setUpdated();
+        this.getProject().update();
         this.getProject().save();
     }
     
@@ -366,8 +355,11 @@ public class StateBuilder extends State
     public void setProject(ProjectFile project)
     {
         this.project = project;
-        this.buildManager();
+        this.initManager();
         this.taskMenu.build();
+        
+        // TEST
+        this.desktop.setFileTree(project);
     }
     
     public void setProjectBrowser(FileBrowser browser)
@@ -425,8 +417,17 @@ public class StateBuilder extends State
         else {this.toolInit(new ToolProject(this));}
     }
     
+    public void toolClose()
+    {
+        this.toolClose(this.toolFocus);
+    }
+    
     public void toolClose(int id)
     {
+        // Remove Taskbar Icon
+        this.taskbar.removeItem(this.toolArray.get(id).getTaskbarRef());
+        
+        // Remove Tool Object
         this.toolArray.remove(id);
         if(this.toolArray.isEmpty()) {this.toolActive = false;}
         else {this.toolFocus = this.getToolNext();}
@@ -447,15 +448,57 @@ public class StateBuilder extends State
     
     public void toolInit(Tool tool)
     {
+        // Create Taskbar Icon
+        this.taskbar.addItem(tool.getTaskbarItem());
+        
+        // Create Tool Object
         this.toolActive = true;
         this.toolArray.add(tool);
         this.toolFocus = tool.getToolID();
-        this.taskbar.addItem(tool.getTaskbarItem());
     }
     
+    @SuppressWarnings("ThrowableResultIgnored")
     private void zTest()
     {
-        //
+        // Manager
+        this.setProject(ProjectManager.getProject("Mushroom"));
+        Engine.setAppVariable("ENGINE_MANAGER", new FileManager(this.project.getFileName()));
+        
+        // Folder Search
+        Console.br();
+        Console.tableLine();
+        Console.tableBr();
+        Console.tableWrite("Project: " + this.project.getFileName());
+        Console.tableBr();
+        
+        // Board Files
+        Console.tableLine();
+        this.zTestPrint("Board Files", this.getManager().Board().getBoardArray());
+        
+        // Character Files
+        Console.tableLine();
+        this.zTestPrint("Character Files", this.getManager().Character().getCharacterArray());
+        
+        // Item Files
+        Console.tableLine();
+        this.zTestPrint("Item Files", this.getManager().Item().getItemArray());
+        
+        // Tileset Files
+        Console.tableLine();
+        this.zTestPrint("Tileset Files", this.getManager().Tileset().getTilesetArray());
+        
+        // Done
+        Console.tableLine();
+        Console.br();
+    }
+    
+    private void zTestPrint(String title, ArrayList<FileItem> files)
+    {
+        Console.tableWrite(title, "(" + files.size() + ")");
+        for(int x = 0; x < files.size(); x++)
+        {
+            Console.tableWrite(" • " + files.get(x).getName(), files.get(x).getDate().getDisplay());
+        }
     }
     
 }

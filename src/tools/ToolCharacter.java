@@ -3,7 +3,6 @@ package tools;
 import gfx.Drawing;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import states.StateBuilder;
 
 public class ToolCharacter extends Tool

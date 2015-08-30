@@ -34,6 +34,11 @@ public class Textbox extends Focus
         return this.textboxArea;
     }
     
+    public String getValue()
+    {
+        return this.textboxValue;
+    }
+    
     public void inputKey(String key)
     {
         if(key.equals("DELETE")) {this.inputKeyDelete();}

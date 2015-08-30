@@ -92,12 +92,13 @@ public class ToolLava extends Tool
             if(file != null)
             {
                 this.modal();
-                this.fileOpen(this.getState().managerLava.loadLava(file.getPath()));
+                this.fileOpen(this.getState().getManager().Lava().loadLava(file.getPath()));
             }
             return;
         }
         
-        // Close Button ?? done in superclass?
+        // Close Button
+        if(this.getCloseRect().contains(e.getPoint())) {this.inputClickClose();}
         
         // Toolbar (should check if toolbar area contains e point)
         ToolbarItem click = this.toolbar.inputClick(e);
@@ -162,24 +163,24 @@ public class ToolLava extends Tool
         Text.write(g, "LINE", this.getAreaStatus().x + 468, this.getAreaStatus().y + 22, "LEFT", "TOOLBAR", "BLACK");
         Text.write(g, "1", this.getAreaStatus().x + 568, this.getAreaStatus().y + 22, "RIGHT", "TOOLBAR_BOLD", "BLACK");
         //this.inputScript.getCursorPosX()
-        Drawing.drawLine(g, this.getAreaStatus().x + 454, this.getAreaStatus().y, this.getAreaStatus().x + 444, this.getAreaStatus().y + this.getAreaStatus().height, null);
+        Drawing.drawLine(g, this.getAreaStatus().x + 454, this.getAreaStatus().y, this.getAreaStatus().x + 444, this.getAreaStatus().y + this.getAreaStatus().height, "BLACK");
         
         // Column
         Text.write(g, "COLUMN", this.getAreaStatus().x + 624, this.getAreaStatus().y + 22, "LEFT", "TOOLBAR", "BLACK");
         //Text.write(g, "1", this.getAreaStatus().x + 700, this.getAreaStatus().y + 22, "RIGHT", "TOOLBAR_BOLD", "BLACK");
         Text.write(g, "1", this.getAreaStatus().x + 764, this.getAreaStatus().y + 22, "RIGHT", "TOOLBAR_BOLD", "BLACK");
         //this.inputScript.getCursorPosY()
-        Drawing.drawLine(g, this.getAreaStatus().x + 610, this.getAreaStatus().y, this.getAreaStatus().x + 600, this.getAreaStatus().y + this.getAreaStatus().height, null);
+        Drawing.drawLine(g, this.getAreaStatus().x + 610, this.getAreaStatus().y, this.getAreaStatus().x + 600, this.getAreaStatus().y + this.getAreaStatus().height, "BLACK");
         
         // Errors
         Text.write(g, "ERROR COUNT", this.getAreaStatus().x + 820, this.getAreaStatus().y + 22, "LEFT", "TOOLBAR", "BLACK");
         Text.write(g, "0", this.getAreaStatus().x + 1044, this.getAreaStatus().y + 22, "RIGHT", "TOOLBAR_BOLD", "BLACK");
-        Drawing.drawLine(g, this.getAreaStatus().x + 806, this.getAreaStatus().y, this.getAreaStatus().x + 796, this.getAreaStatus().y + this.getAreaStatus().height, null);
+        Drawing.drawLine(g, this.getAreaStatus().x + 806, this.getAreaStatus().y, this.getAreaStatus().x + 796, this.getAreaStatus().y + this.getAreaStatus().height, "BLACK");
         
         // Updated
         Text.write(g, "LAST UPDATED", this.getAreaStatus().x + 1100, this.getAreaStatus().y + 22, "LEFT", "TOOLBAR", "BLACK");
         Text.write(g, "20/08/2015", this.getAreaStatus().x + this.getAreaStatus().width - 15, this.getAreaStatus().y + 22, "RIGHT", "TOOLBAR_BOLD", "BLACK");
-        Drawing.drawLine(g, this.getAreaStatus().x + 1086, this.getAreaStatus().y, this.getAreaStatus().x + 1076, this.getAreaStatus().y + this.getAreaStatus().height, null);
+        Drawing.drawLine(g, this.getAreaStatus().x + 1086, this.getAreaStatus().y, this.getAreaStatus().x + 1076, this.getAreaStatus().y + this.getAreaStatus().height, "BLACK");
     }
     
     public void tick()
@@ -196,7 +197,7 @@ public class ToolLava extends Tool
         }
         if(item.getRef().equals("FILE_OPEN"))
         {
-            this.modal(new FileBrowser("OPEN LAVA SCRIPT", this.getState().managerLava.getLavaArray()));
+            this.modal(new FileBrowser("OPEN LAVA SCRIPT", this.getState().getManager().Lava().getLavaArray()));
         }
         if(item.getRef().equals("FILE_SAVE"))
         {

@@ -54,7 +54,11 @@ public class StateIntro extends State
 
     public void tick()
     {
-        // TEMP
+        // NOTE: need to look for the main config file for the app (this should be in the same dir as this jar)
+        // if we found the config file, launch the StateLoad state and begin to setup the builder
+        // else create the config file, launch the StateNew state and begin to setup the builder
+        //Engine.setState(new StateLoad());
+        
         Engine.setState(new StateBuilder());
     }
     

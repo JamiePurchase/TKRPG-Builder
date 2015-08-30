@@ -84,7 +84,8 @@ public class ToolTileset extends Tool
             return;
         }
         
-        // Close Button ?? done in superclass?
+        // Close Button
+        if(this.getCloseRect().contains(e.getPoint())) {this.inputClickClose();}
         
         // Toolbar (should check if toolbar area contains e point)
         ToolbarItem click = this.toolbar.inputClick(e);

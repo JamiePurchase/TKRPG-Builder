@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import projects.ProjectFile;
+import projects.ProjectManager;
 import states.StateBuilder;
 import states.StateEngine;
 import styles.Scheme;
@@ -33,9 +34,10 @@ public class Taskbar
         //this.taskbarItems.add(new TaskbarItem("HELLO", null, null));
     }
     
-    public void addItem(TaskbarItem item)
+    public int addItem(TaskbarItem item)
     {
         this.taskbarItems.add(item);
+        return this.taskbarItems.size() - 1;
     }
     
     private String getClockDate()
@@ -121,7 +123,7 @@ public class Taskbar
         // No Project
         if(this.state.getProject() == null)
         {
-            this.state.setProjectBrowser(new FileBrowser("OPEN PROJECT", this.state.managerProject.getProjectArray()));
+            this.state.setProjectBrowser(new FileBrowser("OPEN PROJECT", ProjectManager.getProjectArray()));
         }
         
         // Project Loaded
@@ -161,6 +163,19 @@ public class Taskbar
         
         // Clock
         this.renderClock(g);
+    }
+    
+    public void removeItem(int position)
+    {
+        this.taskbarItems.remove(position);
+    }
+    
+    public void removeItem(String ref)
+    {
+        for(int x = 0; x < this.taskbarItems.size(); x++)
+        {
+            if(this.taskbarItems.get(x).checkRef(ref)) {this.removeItem(x);}
+        }
     }
     
     private void renderClock(Graphics g)

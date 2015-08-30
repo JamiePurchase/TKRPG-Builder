@@ -60,6 +60,11 @@ public class ToolbarItemButton extends ToolbarItem
         this.buttonDisable = value;
     }
     
+    public void setImage(BufferedImage image)
+    {
+        this.buttonImage = image;
+    }
+    
     public void tick()
     {
         

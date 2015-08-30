@@ -27,28 +27,15 @@ public abstract class Tool
     
     public Tool(StateBuilder state, String ref, int id, String title, BufferedImage icon)
     {
-        this.state = state;
-        this.toolRef = ref;
-        this.toolID = id;
-        this.toolTitle = title;
-        this.toolArea = new Rectangle(0, 0, 1366, 718);
-        this.toolFocus = true;
-        this.toolSaved = true;
-        this.toolTaskIcon = icon;
+        this.init(state, ref, id, title, icon, new Rectangle(0, 0, 1366, 718));
     }
     
-    public Tool(StateBuilder state, int id, String title, Rectangle area, BufferedImage icon)
+    public Tool(StateBuilder state, String ref, int id, String title, Rectangle area, BufferedImage icon)
     {
-        this.state = state;
-        this.toolID = id;
-        this.toolTitle = title;
-        this.toolArea = area;
-        this.toolFocus = true;
-        this.toolSaved = true;
-        this.toolTaskIcon = icon;
+        this.init(state, ref, id, title, icon, area);
     }
     
-    private Rectangle getCloseRect()
+    public Rectangle getCloseRect()
     {
         return new Rectangle(this.toolArea.x + this.toolArea.width - 28, this.toolArea.y + 6, 22, 22);
     }
@@ -60,7 +47,12 @@ public abstract class Tool
     
     public TaskbarItem getTaskbarItem()
     {
-        return new TaskbarItem(this.toolTitle, this, this.toolTaskIcon);
+        return new TaskbarItem(this.getTaskbarRef(), this.toolTitle, this, this.toolTaskIcon);
+    }
+    
+    public String getTaskbarRef()
+    {
+        return "TASKBAR_" + this.toolRef;
     }
     
     public int getToolID()
@@ -83,6 +75,18 @@ public abstract class Tool
         return this.toolRef;
     }
     
+    private void init(StateBuilder state, String ref, int id, String title, BufferedImage icon, Rectangle area)
+    {
+        this.state = state;
+        this.toolRef = ref;
+        this.toolID = id;
+        this.toolTitle = title;
+        this.toolArea = area;
+        this.toolFocus = true;
+        this.toolSaved = true;
+        this.toolTaskIcon = icon;
+    }
+    
     public abstract void inputClick(MouseEvent e);
     
     public void inputClickClose()
@@ -91,6 +95,7 @@ public abstract class Tool
         {
             // NOTE: come back to this
         }
+        this.state.toolClose();
     }
     
     public abstract void inputKey(String key);

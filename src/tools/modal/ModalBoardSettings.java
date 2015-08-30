@@ -1,6 +1,7 @@
 package tools.modal;
 
 import board.BoardFile;
+import debug.Console;
 import gfx.Text;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -24,8 +25,8 @@ public class ModalBoardSettings extends Modal
         this.tool = tool;
         this.file = file;
         this.textboxName = new Textbox("NAME", new Rectangle(), file.getName(), 12);
-        this.textboxSizeX = new Intbox("SIZE_X", new Rectangle(), file.getSizeX());
-        this.textboxSizeY = new Intbox("SIZE_Y", new Rectangle(), file.getSizeY());
+        //this.textboxSizeX = new Intbox("SIZE_X", new Rectangle(600, 350, 200, 50), file.getSizeX());
+        //this.textboxSizeY = new Intbox("SIZE_Y", new Rectangle(800, 350, 200, 50), file.getSizeY());
         this.buttonAccept = new Button("OK", "OK", 583, 434);
         // NOTE: need to consider cleaning up the focus (when one gains, others must lose)
     }
@@ -56,6 +57,9 @@ public class ModalBoardSettings extends Modal
     
     private void renderContent(Graphics g)
     {
+        // DEBUG
+        Console.print("MODAL BOARD SETTINGS -> RENDER CONTENT");
+        
         // Board Name
         Text.write(g, "Name", this.getArea().x + 25, this.getArea().y + 75, "LEFT", "MESSAGE_STANDARD", "BLACK");
         this.textboxName.render(g);

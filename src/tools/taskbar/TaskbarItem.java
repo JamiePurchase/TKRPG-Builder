@@ -12,15 +12,22 @@ import tools.ui.Tooltip;
 
 public class TaskbarItem
 {
-    private String itemName;
+    private String itemRef, itemName;
     private Tool itemTool;
     private BufferedImage itemIcon;
     
-    public TaskbarItem(String name, Tool tool, BufferedImage icon)
+    public TaskbarItem(String ref, String name, Tool tool, BufferedImage icon)
     {
+        this.itemRef = ref;
         this.itemName = name;
         this.itemTool = tool;
         this.itemIcon = icon;
+    }
+    
+    public boolean checkRef(String check)
+    {
+        if(this.itemRef.equals(check)) {return true;}
+        return false;
     }
     
     public Rectangle getArea(int position)

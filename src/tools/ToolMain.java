@@ -15,7 +15,7 @@ public class ToolMain extends Tool
     
     public ToolMain(StateBuilder state)
     {
-        super(state, state.getToolNext(), "TKRPG Builder", new Rectangle(0, 0, 1366, 718), null);
+        super(state, "MAIN", state.getToolNext(), "TKRPG Builder", new Rectangle(0, 0, 1366, 718), null);
         this.modal = null;
     }
     
