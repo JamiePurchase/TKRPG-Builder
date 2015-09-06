@@ -11,19 +11,20 @@ import states.StateBuilder;
 import styles.Scheme;
 import tools.files.FileBrowser;
 import framework.files.FileItem;
+import tiles.TileFile;
 import tools.modal.Modal;
 import tools.toolbar.Toolbar;
 import tools.toolbar.ToolbarItem;
 import tools.ui.Textbox;
 
-public class ToolItem extends Tool
+public class ToolTilePaint extends Tool
 {
     // Toolbar
     private Toolbar toolbar;
     
     // Item File
-    private boolean itemFileActive, itemFileSaved;
-    private ItemFile itemFileObject;
+    private boolean tileFileActive, tileFileSaved;
+    private TileFile tileFileObject;
     
     // Inputs
     private Textbox inputName;
@@ -32,15 +33,19 @@ public class ToolItem extends Tool
     private boolean modalActive;
     private FileBrowser modalObject;
     
-    public ToolItem(StateBuilder state)
+    public ToolTilePaint(StateBuilder state)
     {
-        super(state, "ITM", state.getToolNext(), "ITEM EDITOR", Drawing.getImage("icon/tool_items.png"));
+        super(state, "T32", state.getToolNext(), "TILE EDITOR", Drawing.getImage("icon/tool_items.png"));
         
         // Toolbar
         this.toolbarInit();
         
         // Item File
         this.fileClose();
+        
+        // TEMP
+        this.tileFileActive = true;
+        this.tileFileObject = new TileFile();
         
         // Inputs
         this.inputName = new Textbox("NAME", new Rectangle(175, 100, 400, 35), "", 20);
@@ -55,36 +60,36 @@ public class ToolItem extends Tool
     
     public void fileClose()
     {
-        this.itemFileActive = false;
-        this.itemFileObject = null;
-        this.itemFileSaved = true;
+        this.tileFileActive = false;
+        this.tileFileObject = null;
+        this.tileFileSaved = true;
         this.updateTitle();
     }
     
     public void fileNew()
     {
         // NOTE: consider how this works
-        this.itemFileActive = true;
-        this.itemFileObject = null;
-        this.itemFileSaved = false;
+        this.tileFileActive = true;
+        this.tileFileObject = null;
+        this.tileFileSaved = false;
         this.updateTitle();
     }
     
-    public void fileOpen(ItemFile file)
+    public void fileOpen(TileFile file)
     {
-        this.itemFileActive = true;
-        this.itemFileObject = file;
-        this.itemFileSaved = true;
+        this.tileFileActive = true;
+        this.tileFileObject = file;
+        this.tileFileSaved = true;
         this.updateTitle();
         
         // Inputs
-        this.inputName.setValue(this.itemFileObject.getName());
+        //this.inputName.setValue(this.tileFileObject.getName());
     }
     
     public void inputClick(MouseEvent e)
     {
         // Modal Active
-        if(this.modalActive)
+        /*if(this.modalActive)
         {
             FileItem file = this.modalObject.inputClickFile(e);
             if(file != null)
@@ -93,7 +98,7 @@ public class ToolItem extends Tool
                 this.fileOpen(this.getState().getManager().Item().loadItem(file.getPath()));
             }
             return;
-        }
+        }*/
         
         // Close Button
         if(this.getCloseRect().contains(e.getPoint())) {this.inputClickClose();}
@@ -125,20 +130,24 @@ public class ToolItem extends Tool
     {
         this.renderWindow(g, Scheme.Colour("STANDARD_BACK"));
         this.toolbar.render(g);
-        if(this.itemFileActive) {this.renderContent(g);}
+        if(this.tileFileActive) {this.renderContent(g);}
         if(this.modalActive) {this.modalObject.render(g);}
     }
     
     private void renderContent(Graphics g)
     {
-        // NOTE: we need to have a single form group that holds multiple ui elements and can render and tick them all
-        
-        // Item Name
-        Text.write(g, "Name", 75, 125, "LEFT", "MESSAGE", "BLACK");
-        this.inputName.render(g);
-        
-        // Project Info
-        //Text.write(g, this.itemFileObject.getInfo(), 75, 175, "LEFT", "MESSAGE", "BLACK");
+        if(this.tileFileActive) {this.renderContentTile(g);}
+    }
+    
+    private void renderContentTile(Graphics g)
+    {
+        for(int x = 0; x < 32; x++)
+        {
+            for(int y = 0; y < 32; y++)
+            {
+                Drawing.fillRect(g, new Rectangle((32 * x) + 50, (32 * y) + 50, 32, 32), this.tileFileObject.getPixel(x, y).getColor());
+            }
+        }
     }
     
     public void tick()
@@ -155,24 +164,19 @@ public class ToolItem extends Tool
         }
         if(item.getRef().equals("FILE_OPEN"))
         {
-            // TEMP
-            //this.fileOpen(this.getState().managerItem.loadItem("iron_sword"));
-            
-            // TEMP
-            //ArrayList<FileItem> fileItems =
-            this.modal(new FileBrowser("OPEN ITEM", this.getState().getManager().Item().getItemArray()));
+            //
         }
         if(item.getRef().equals("FILE_SAVE"))
         {
-            this.itemFileObject.save();
-            this.itemFileSaved = true;
+            //this.tileFileObject.save();
+            //this.tileFileSaved = true;
         }
     }
     
     private void toolbarInit()
     {
         this.toolbar = new Toolbar(new Rectangle(0, 34, 1366, 42));
-        this.toolbar.addLabel("ITEM");
+        this.toolbar.addLabel("TILE");
         this.toolbar.addButton("FILE_NEW", "file_new");
         this.toolbar.addButton("FILE_OPEN", "file_open");
         this.toolbar.addButton("FILE_SAVE", "file_save");
@@ -181,9 +185,9 @@ public class ToolItem extends Tool
     
     private void updateTitle()
     {
-        String title = "ITEM EDITOR";
-        if(this.itemFileActive) {title += " - " + this.itemFileObject.getName();}
-        if(!this.itemFileSaved) {title += " *";}
+        String title = "TILE EDITOR";
+        //if(this.tileFileActive) {title += " - " + this.tileFileObject.getName();}
+        if(!this.tileFileSaved) {title += " *";}
         this.setTitle(title);
     }
     

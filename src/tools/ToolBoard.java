@@ -6,15 +6,20 @@ import board.BoardFile;
 import board.BoardManager;
 import board.BoardTerrain;
 import board.Direction;
+import board.zones.Zone;
+import board.zones.ZoneCollision;
 import debug.Console;
 import gfx.Drawing;
 import gfx.Text;
 import items.ItemFile;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import states.StateBuilder;
 import styles.Scheme;
 import tools.board.ModalStats;
@@ -23,6 +28,11 @@ import tools.board.ToolLighting;
 import tools.board.ToolMode;
 import tools.board.ToolTerrain;
 import tools.board.ToolZone;
+import tools.board.pane.Pane;
+import tools.board.pane.PaneEntity;
+import tools.board.pane.PaneLighting;
+import tools.board.pane.PaneTerrain;
+import tools.board.pane.PaneZone;
 import tools.files.FileBrowser;
 import tools.modal.Modal;
 import tools.modal.ModalBoardNew;
@@ -45,6 +55,7 @@ public class ToolBoard extends Tool
     private ToolTerrain optionPaintType;
     private BoardTerrain optionPaintTerrain;
     private ToolEntity optionEntityType;
+    private Zone optionZoneSelect;
     private ToolZone optionZoneType;
     private ArrayList<String> optionZoneDrawPoints;
     private ToolLighting optionLightingType;
@@ -60,6 +71,9 @@ public class ToolBoard extends Tool
     
     // Toolbar
     private Toolbar toolbar;
+    
+    // Tool Pane
+    private HashMap<String, Pane> toolPane;
     
     public ToolBoard(StateBuilder state)
     {
@@ -77,6 +91,7 @@ public class ToolBoard extends Tool
         this.optionPaintType = ToolTerrain.BRUSH;
         this.optionPaintTerrain = new BoardTerrain(this.getState().getManager().Tileset().loadTileset("TEST"), 2, 0);
         this.optionEntityType = ToolEntity.SELECT;
+        this.optionZoneSelect = null;
         this.optionZoneType = ToolZone.SELECT;
         this.optionZoneDrawPoints = new ArrayList();
         this.optionLightingType = ToolLighting.SELECT;
@@ -91,6 +106,9 @@ public class ToolBoard extends Tool
         
         // Toolbar
         this.toolbarInit();
+        
+        // Tool Pane
+        this.toolPaneInit();
     }
     
     public void fileClose()
@@ -124,9 +142,9 @@ public class ToolBoard extends Tool
     {
         if(this.optionViewRuler)
         {
-            return new Rectangle(this.getToolRectContent().x + 32, this.getToolRectContent().y + 32, this.getToolRectContent().width - 64, this.getToolRectContent().height - 96);
+            return new Rectangle(this.getToolRectContent().x + 32, this.getToolRectContent().y + 32, 1120, this.getToolRectContent().height - 96);
         }
-        else {return new Rectangle(this.getToolRectContent().x, this.getToolRectContent().y, this.getToolRectContent().width - 32, this.getToolRectContent().height - 64);}
+        else {return new Rectangle(this.getToolRectContent().x, this.getToolRectContent().y, 1152, this.getToolRectContent().height - 64);}
     }
     
     private Rectangle getAreaRuler(boolean horizontal)
@@ -137,8 +155,8 @@ public class ToolBoard extends Tool
     
     private Rectangle getAreaScroll(boolean horizontal)
     {
-        if(horizontal) {return new Rectangle(this.getToolRectContent().x, getToolRectContent().y + getToolRectContent().height - 64, getToolRectContent().width - 32, 32);}
-        return new Rectangle(this.getToolRectContent().x + this.getToolRectContent().width - 32, getToolRectContent().y, 32, getToolRectContent().height - 64);
+        if(horizontal) {return new Rectangle(this.getToolRectContent().x, getToolRectContent().y + getToolRectContent().height - 64, this.getAreaBoard().width - 32, 32);}
+        return new Rectangle(this.getAreaTools().x - 32, this.getAreaBoard().y, 32, getToolRectContent().height - 64);
     }
     
     private Rectangle getAreaScrollArrow(Direction face)
@@ -163,12 +181,23 @@ public class ToolBoard extends Tool
     
     private Rectangle getAreaTools()
     {
-        return new Rectangle();
+        return new Rectangle(this.getToolRectContent().x + this.getToolRectContent().width - 203, this.getToolRectContent().y - 1, 203, this.getToolRectContent().height - 31);
     }
     
     public BoardFile getFile()
     {
         return this.boardFileObject;
+    }
+    
+    private boolean getRenderZones()
+    {
+        if(this.boardMode == ToolMode.ZONE) {return true;}
+        return false;
+    }
+    
+    private Pane getToolPane()
+    {
+        return this.toolPane.get("PANE_" + this.boardMode.toString());
     }
     
     public void inputClick(MouseEvent e)
@@ -294,6 +323,9 @@ public class ToolBoard extends Tool
         if(this.optionZoneType == ToolZone.SELECT)
         {
             // Did we click on a zone?
+            Zone zone = this.boardFileObject.getZoneContain(new Point(this.getAreaBoard().x + (32 * tileX), this.getAreaBoard().y + (32 * tileY)));
+            if(zone != null) {this.optionZoneSelect = zone;}
+            else {this.optionZoneSelect = null;}
         }
         
         // Draw
@@ -307,10 +339,12 @@ public class ToolBoard extends Tool
                 // can only end a polygon on the first point
                 if(this.optionZoneDrawPoints.get(x).equals(tileX + "|" + tileY))
                 {
-                    // TO BE DONE (create the zone)
-                    // convert the tile pairs into polygon points
-                    // create the zone and add it to the board
-                    this.optionZoneDrawPoints = new ArrayList();
+                    // TEMP
+                    String[] zoneOrigin = this.optionZoneDrawPoints.get(0).split("\\|");
+                    if(Integer.parseInt(zoneOrigin[0]) == tileX && Integer.parseInt(zoneOrigin[1]) == tileY)
+                    {
+                        this.inputClickBoardTileZoneCreate();
+                    }
                     return;
                 }
             }
@@ -323,7 +357,31 @@ public class ToolBoard extends Tool
         if(this.optionZoneType == ToolZone.DELETE)
         {
             // Did we click on a zone?
+            int zone = this.boardFileObject.getZoneContainIndex(new Point(this.getAreaBoard().x + (32 * tileX), this.getAreaBoard().y + (32 * tileY)));
+            if(zone >= 0) {this.boardFileObject.removeZone(zone);}
+            
+            // NOTE: might be worth creating an 'are you sure' confirmation dialog
         }
+    }
+    
+    private void inputClickBoardTileZoneCreate()
+    {
+        // Convert the points into int arrays
+        int[] polyX = new int[this.optionZoneDrawPoints.size()];
+        int[] polyY = new int[this.optionZoneDrawPoints.size()];
+        for(int p = 0; p < this.optionZoneDrawPoints.size(); p++)
+        {
+            polyX[p] = Integer.parseInt(this.optionZoneDrawPoints.get(p).split("\\|")[0]) * 32;
+            polyY[p] = Integer.parseInt(this.optionZoneDrawPoints.get(p).split("\\|")[1]) * 32;
+        }
+
+        // Create a new zone using the int arrays to build the polygon
+        Polygon polygon = new Polygon(polyX, polyY, polyX.length);
+        this.boardFileObject.addZone(new ZoneCollision(this.boardFileObject, polygon, "NEW ZONE"));
+        // NOTE: do something else with the naming
+
+        // Clear the zone drawing tool
+        this.optionZoneDrawPoints = new ArrayList();
     }
     
     private void inputClickScrollH(MouseEvent e)
@@ -360,7 +418,11 @@ public class ToolBoard extends Tool
         Drawing.fillRect(g, this.getAreaBoard(), "WHITE");
         
         // Ruler
-        if(this.optionViewRuler) {this.renderContentRuler(g);}
+        if(this.optionViewRuler)
+        {
+            this.renderContentRulerH(g);
+            this.renderContentRulerV(g);
+        }
         
         // Scrollbars
         this.renderContentScroll(g);
@@ -373,23 +435,42 @@ public class ToolBoard extends Tool
         
         // Status
         this.renderStatus(g);
+        
+        // Tools
+        this.getToolPane().render(g);
     }
     
     private void renderContentBoard(Graphics g)
     {
         // Terrain
-        if(this.boardFileActive) {this.boardFileObject.render(g, this.getAreaBoard(), this.boardOffsetX, this.boardOffsetY, this.optionViewGrid);}
+        if(this.boardFileActive) {this.boardFileObject.render(g, this.getAreaBoard(), this.boardOffsetX, this.boardOffsetY, this.optionViewGrid, this.getRenderZones());}
         
         // Border
         if(this.optionViewRuler) {Drawing.drawRect(g, this.getAreaBoard(), "BLACK");}
     }
     
-    private void renderContentRuler(Graphics g)
+    private void renderContentRulerH(Graphics g)
     {
+        // Background
         Drawing.fillRect(g, this.getAreaRuler(true), Scheme.Colour("STANDARD_BACK"));
-        Drawing.fillRect(g, this.getAreaRuler(false), Scheme.Colour("STANDARD_BACK"));
+        
+        // Border
         Drawing.drawRect(g, this.getAreaRuler(true), "BLACK", false, true, true, false);
+        
+        // Text
+        //
+    }
+    
+    private void renderContentRulerV(Graphics g)
+    {
+        // Background
+        Drawing.fillRect(g, this.getAreaRuler(false), Scheme.Colour("STANDARD_BACK"));
+        
+        // Border
         Drawing.drawRect(g, this.getAreaRuler(false), "BLACK", false, true, true, false);
+        
+        // Text
+        //
     }
     
     private void renderContentScroll(Graphics g)
@@ -541,7 +622,7 @@ public class ToolBoard extends Tool
         }
         if(item.getRef().equals("FILE_SAVE"))
         {
-            System.out.println("TOOL BOARD -> SAVE");
+            Console.print("TOOL BOARD -> SAVE");
             this.boardFileObject.update();
             this.boardFileObject.save();
         }
@@ -807,6 +888,20 @@ public class ToolBoard extends Tool
         this.toolbar.addButton("ZONE_SELECT", "board_zone_select");
         this.toolbar.addButton("ZONE_DRAW", "board_zone_create", true);
         this.toolbar.addButton("ZONE_DELETE", "board_zone_delete", true);
+    }
+    
+    private void toolPaneInit()
+    {
+        this.toolPane = new HashMap();
+        this.toolPane.put("PANE_TERRAIN", new PaneTerrain(this, this.getAreaTools()));
+        this.toolPane.put("PANE_ENTITY", new PaneEntity(this, this.getAreaTools()));
+        this.toolPane.put("PANE_ZONE", new PaneZone(this, this.getAreaTools()));
+        this.toolPane.put("PANE_LIGHTING", new PaneLighting(this, this.getAreaTools()));
+    }
+    
+    public Zone toolZoneSelect()
+    {
+        return this.optionZoneSelect;
     }
     
     public void setModalSettings(boolean value)

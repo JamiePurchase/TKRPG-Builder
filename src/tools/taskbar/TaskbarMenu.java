@@ -45,6 +45,7 @@ public class TaskbarMenu
             this.menuItems.add(new TaskbarMenuItem(this, "BRD", "BOARD EDITOR", "file_new"));
             this.menuItems.add(new TaskbarMenuItem(this, "ITM", "ITEM EDITOR", "file_new"));
             this.menuItems.add(new TaskbarMenuItem(this, "LVA", "LAVA EDITOR", "file_new"));
+            this.menuItems.add(new TaskbarMenuItem(this, "T32", "TILE EDITOR", "file_new"));
         }
         
         // Standard Options
@@ -102,6 +103,9 @@ public class TaskbarMenu
         
         // Lava Editor
         if(ref.equals("LVA")) {this.state.toolActionLava();}
+        
+        // Tile Editor
+        if(ref.equals("T32")) {this.state.toolActionTile();}
         
         // Settings
         if(ref.equals("CONFIG")) {state.actionConfig(true);}

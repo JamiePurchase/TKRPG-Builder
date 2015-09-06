@@ -19,6 +19,7 @@ import tools.ToolItem;
 import tools.ToolLava;
 import tools.ToolMain;
 import tools.ToolProject;
+import tools.ToolTilePaint;
 import tools.desktop.Desktop;
 import tools.desktop.DesktopItem;
 import tools.files.FileBrowser;
@@ -100,9 +101,9 @@ public class StateBuilder extends State
         
         // TEST
         /*ItemFile testSword = this.managerItem.loadItem("iron_sword");
-            System.out.println("LOAD ITEM");
-            System.out.println(testSword);
-            System.out.println("");*/
+            Console.print("LOAD ITEM");
+            Console.print(testSword);
+            Console.print("");*/
         
         // TEMP
         this.desktop.addItem(new DesktopItem("TEST1", "TEST1", Drawing.getImage("icon/tool_board.png")));
@@ -193,17 +194,17 @@ public class StateBuilder extends State
 
     public void inputKeyPress(String key)
     {
-        System.out.println("STATE BUILDER -> INPUT KEY PRESS (" + key + ")");
+        Console.print("STATE BUILDER -> INPUT KEY PRESS (" + key + ")");
     }
 
     public void inputKeyRelease(String key)
     {
-        System.out.println("STATE BUILDER -> INPUT KEY RELEASE (" + key + ")");
+        Console.print("STATE BUILDER -> INPUT KEY RELEASE (" + key + ")");
     }
 
     public void inputKeyType(String key)
     {
-        System.out.println("STATE BUILDER -> INPUT KEY TYPE (" + key + ")");
+        Console.print("STATE BUILDER -> INPUT KEY TYPE (" + key + ")");
         // NOTE: shortcuts? other things? combintions of keys?
         
         // TEST
@@ -415,6 +416,15 @@ public class StateBuilder extends State
 
         // Open Project Tool
         else {this.toolInit(new ToolProject(this));}
+    }
+    
+    public void toolActionTile()
+    {
+        // Switch to Tile Tool
+        if(this.getToolOpen("T32")) {this.toolFocus("T32");}
+
+        // Open Tile Tool
+        else {this.toolInit(new ToolTilePaint(this));}
     }
     
     public void toolClose()

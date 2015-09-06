@@ -1,5 +1,7 @@
 package tools.focus;
 
+import debug.Console;
+
 public abstract class Focus
 {
     private boolean focusActive;
@@ -21,7 +23,7 @@ public abstract class Focus
     
     public void inputKey(String key)
     {
-        System.out.println("FOCUS KEY: " + key);
+        Console.print("FOCUS KEY: " + key);
     }
     
 }

@@ -1,6 +1,7 @@
 package states;
 
 import app.Engine;
+import debug.Console;
 import gfx.Colour;
 import gfx.Drawing;
 import java.awt.Graphics;
@@ -28,7 +29,7 @@ public class StateEngine extends State
 
     public void inputKeyType(String key)
     {
-        System.out.println("STATE ENGINE -> INPUT KEY TYPE (" + key + ")");
+        Console.print("STATE ENGINE -> INPUT KEY TYPE (" + key + ")");
         // TEST
         if(key.equals("ESCAPE")) {Engine.setState(new StateBuilder());}
     }
